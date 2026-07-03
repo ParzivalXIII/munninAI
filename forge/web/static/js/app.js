@@ -4,8 +4,23 @@
  * Alpine.js components and minimal JS for HTMX interactions.
  */
 
-/* ── Alpine.js Data: Incident Response ──────────────────────────────── */
+/* ── Alpine.js Store: Theme ─────────────────────────────────────────── */
 document.addEventListener('alpine:init', () => {
+  Alpine.store('theme', {
+    current: localStorage.getItem('theme') || 'obsidian',
+
+    init() {
+      // Set initial theme on page load
+      document.documentElement.setAttribute('data-theme', this.current);
+    },
+
+    toggle() {
+      this.current = this.current === 'obsidian' ? 'light' : 'obsidian';
+      localStorage.setItem('theme', this.current);
+      document.documentElement.setAttribute('data-theme', this.current);
+    },
+  });
+
   // Incident Response Chat
   Alpine.data('incidentResponse', () => ({
     phase: 'input',  // input | diagnosing | diagnosis | investigating | resolved

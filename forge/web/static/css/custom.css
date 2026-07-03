@@ -1,46 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════════════
    MunninAI — Obsidian Intelligence Theme
    Custom CSS with neon glow utilities, animations, and component styles
+   NOTE: Tailwind CSS v4 and DaisyUI 5 are loaded via CDN in base.html.
+         Do NOT use @import "tailwindcss" or @plugin here — the browser
+         CDN cannot process build-time directives.
    ═══════════════════════════════════════════════════════════════════════ */
-
-/* ── DaisyUI 5 Theme: Obsidian Intelligence ─────────────────────────── */
-@theme {
-  --color-base-100: oklch(0.07 0.02 270);
-  --color-base-200: oklch(0.11 0.02 270);
-  --color-base-300: oklch(0.15 0.02 270);
-  --color-base-content: oklch(0.90 0.01 270);
-
-  --color-primary: #06b6d4;
-  --color-primary-content: oklch(0.10 0.02 270);
-
-  --color-secondary: #8b5cf6;
-  --color-secondary-content: #ffffff;
-
-  --color-accent: #f59e0b;
-  --color-accent-content: oklch(0.10 0.02 270);
-
-  --color-neutral: oklch(0.19 0.02 270);
-  --color-neutral-content: oklch(0.85 0.01 270);
-
-  --color-info: #0ea5e9;
-  --color-info-content: #ffffff;
-
-  --color-success: #10b981;
-  --color-success-content: #ffffff;
-
-  --color-warning: #f97316;
-  --color-warning-content: #ffffff;
-
-  --color-error: #ef4444;
-  --color-error-content: #ffffff;
-
-  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
-
-  --radius-selector: 0.5rem;
-  --radius-field: 0.5rem;
-  --radius-box: 0.75rem;
-}
 
 /* ── Base Styles ────────────────────────────────────────────────────── */
 html {
@@ -48,10 +12,95 @@ html {
 }
 
 body {
-  font-family: var(--font-family-sans);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+/* ── Obsidian Theme (Dark) ──────────────────────────────────────────── */
+[data-theme="obsidian"] {
+  --color-base-100: oklch(0.07 0.02 270);
+  --color-base-200: oklch(0.11 0.02 270);
+  --color-base-300: oklch(0.15 0.02 270);
+  --color-base-content: oklch(0.90 0.01 270);
+
+  --color-primary: oklch(0.70 0.20 200);
+  --color-primary-content: oklch(0.10 0.02 270);
+
+  --color-secondary: oklch(0.65 0.25 280);
+  --color-secondary-content: #ffffff;
+
+  --color-accent: oklch(0.80 0.20 80);
+  --color-accent-content: oklch(0.10 0.02 270);
+
+  --color-neutral: oklch(0.19 0.02 270);
+  --color-neutral-content: oklch(0.85 0.01 270);
+
+  --color-info: oklch(0.70 0.20 220);
+  --color-info-content: #ffffff;
+
+  --color-success: oklch(0.70 0.20 150);
+  --color-success-content: #ffffff;
+
+  --color-warning: oklch(0.75 0.20 60);
+  --color-warning-content: #ffffff;
+
+  --color-error: oklch(0.65 0.25 30);
+  --color-error-content: #ffffff;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+
+  color-scheme: dark;
+}
+
+/* ── Light Theme ────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --color-base-100: oklch(0.98 0.01 270);
+  --color-base-200: oklch(0.95 0.01 270);
+  --color-base-300: oklch(0.92 0.01 270);
+  --color-base-content: oklch(0.20 0.02 270);
+
+  --color-primary: oklch(0.60 0.20 200);
+  --color-primary-content: #ffffff;
+
+  --color-secondary: oklch(0.55 0.25 280);
+  --color-secondary-content: #ffffff;
+
+  --color-accent: oklch(0.70 0.20 80);
+  --color-accent-content: #ffffff;
+
+  --color-neutral: oklch(0.85 0.01 270);
+  --color-neutral-content: oklch(0.20 0.02 270);
+
+  --color-info: oklch(0.60 0.20 220);
+  --color-info-content: #ffffff;
+
+  --color-success: oklch(0.60 0.20 150);
+  --color-success-content: #ffffff;
+
+  --color-warning: oklch(0.65 0.20 60);
+  --color-warning-content: #ffffff;
+
+  --color-error: oklch(0.55 0.25 30);
+  --color-error-content: #ffffff;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+
+  color-scheme: light;
+}
+
+/* Apply theme colors to body */
+[data-theme="obsidian"] body {
   background-color: var(--color-base-100);
   color: var(--color-base-content);
-  min-height: 100vh;
+}
+
+[data-theme="light"] body {
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
 }
 
 /* ── Neon Glow Utilities ────────────────────────────────────────────── */
