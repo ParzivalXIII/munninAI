@@ -1,0 +1,16 @@
+{# Postmortem Generated Display Component #}
+{# Required: postmortem #}
+
+<div class="animate-slide-up">
+  <div class="chat-bubble-agent p-4">
+    <div class="flex items-center gap-2 mb-3">
+      <img src="/static/images/raven.svg" alt="" class="h-5 w-5">
+      <span class="text-sm font-semibold text-accent">Postmortem Generated</span>
+      <span class="badge badge-xs badge-ghost ml-auto">{{ postmortem.incident_id }}</span>
+    </div>
+    <pre class="text-sm whitespace-pre-wrap font-sans leading-relaxed bg-base-100/50 rounded-lg p-3">{{ postmortem.postmortem_text }}</pre>
+    {% if postmortem.generated_at %}
+    <p class="text-xs opacity-40 mt-2">Generated: {{ postmortem.generated_at[:19] }}</p>
+    {% endif %}
+  </div>
+</div>

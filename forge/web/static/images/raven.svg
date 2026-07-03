@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Raven silhouette - MunninAI Logo -->
+  <defs>
+    <linearGradient id="ravenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Body -->
+  <path d="M32 8c-8 0-16 6-18 14-1 4 0 8 2 11l-4 3c-1 1-1 2 0 3l6 2c2 4 6 8 10 10v5c0 1 1 2 2 2h4c1 0 2-1 2-2v-5c4-2 8-6 10-10l6-2c1-1 1-2 0-3l-4-3c2-3 3-7 2-11C48 14 40 8 32 8z" fill="url(#ravenGrad)" filter="url(#glow)" opacity="0.9"/>
+  <!-- Eye -->
+  <circle cx="26" cy="22" r="2.5" fill="#0a0a0f"/>
+  <circle cx="26" cy="21.5" r="1" fill="#06b6d4" opacity="0.8"/>
+  <!-- Beak -->
+  <path d="M20 26l-6 2 6 1z" fill="#f59e0b" opacity="0.9"/>
+  <!-- Wing detail -->
+  <path d="M36 24c4 2 8 6 10 10M34 28c3 2 6 5 8 8" stroke="#0a0a0f" stroke-width="0.8" opacity="0.3" fill="none"/>
+</svg>

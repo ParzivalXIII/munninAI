@@ -1,0 +1,15 @@
+{# Metrics Refresh Fragment (HTMX) #}
+<div class="flex items-center gap-6">
+  <div class="text-center">
+    <p class="text-2xl font-bold text-primary">{{ total_incidents }}</p>
+    <p class="text-xs opacity-50">Total</p>
+  </div>
+  <div class="text-center">
+    <p class="text-2xl font-bold {% if active_incidents > 0 %}text-error{% else %}text-success{% endif %}">{{ active_incidents }}</p>
+    <p class="text-xs opacity-50">Active</p>
+  </div>
+  <div class="text-center">
+    <p class="text-2xl font-bold text-accent">{{ avg_mttr }}m</p>
+    <p class="text-xs opacity-50">Avg MTTR</p>
+  </div>
+</div>

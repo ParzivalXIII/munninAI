@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}{{ incident.id }} — {{ incident.title }}{% endblock %}
+
+{% block content %}
+<div class="p-4 lg:p-6 max-w-5xl mx-auto space-y-6">
+
+  {# ── Back Link ── #}
+  <div class="animate-fade-in">
+    <a href="/incidents" class="text-sm text-primary hover:underline flex items-center gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+      Back to Incidents
+    </a>
+  </div>
+
+  {# ── Header ── #}
+  <div class="animate-slide-up">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-sm font-mono opacity-50">{{ incident.id }}</span>
+          <span class="badge badge-sm
+            {% if incident.severity == 'P1' %}badge-p1
+            {% elif incident.severity == 'P2' %}badge-p2
+            {% elif incident.severity == 'P3' %}badge-p3
+            {% else %}badge-p4{% endif %}">
+            {{ incident.severity }}
+          </span>
+          <span class="badge badge-sm badge-ghost">{{ incident.status }}</span>
+        </div>
+        <h1 class="text-xl font-bold">{{ incident.title }}</h1>
+      </div>
+    </div>
+  </div>
+
+  {# ── Key Details ── #}
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up animate-delay-1">
+    <div class="metric-card">
+      <p class="text-xs opacity-50 mb-1">Duration</p>
+      <p class="text-xl font-bold text-primary">{{ incident.duration_minutes }}m</p>
+    </div>
+    <div class="metric-card">
+      <p class="text-xs opacity-50 mb-1">Users Affected</p>
+      <p class="text-xl font-bold text-warning">{{ '{:,}'.format(incident.impact.users_affected | default(0)) }}</p>
+    </div>
+    <div class="metric-card">
+      <p class="text-xs opacity-50 mb-1">Revenue Impact</p>
+      <p class="text-xl font-bold text-error">${{ '{:,}'.format(incident.impact.revenue_impact_usd | default(0)) }}</p>
+    </div>
+    <div class="metric-card">
+      <p class="text-xs opacity-50 mb-1">On-Call</p>
+      <p class="text-xl font-bold text-base-content">{{ incident.on_call_engineer | default('Unknown') }}</p>
+    </div>
+  </div>
+
+  {# ── Two Column ── #}
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    {# ── Symptoms ── #}
+    <div class="card-obsidian p-4 animate-slide-up animate-delay-2">
+      <h2 class="text-sm font-semibold mb-3 opacity-70">Symptoms</h2>
+      <ul class="space-y-2">
+        {% for symptom in incident.symptoms %}
+        <li class="flex items-start gap-2 text-sm">
+          <span class="text-error mt-0.5">●</span>
+          {{ symptom }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    {# ── Root Cause & Resolution ── #}
+    <div class="space-y-4 animate-slide-up animate-delay-2">
+      <div class="card-obsidian p-4">
+        <h2 class="text-sm font-semibold mb-2 text-warning opacity-80">Root Cause</h2>
+        <p class="text-sm leading-relaxed">{{ incident.root_cause }}</p>
+      </div>
+      <div class="card-obsidian p-4">
+        <h2 class="text-sm font-semibold mb-2 text-success opacity-80">Resolution</h2>
+        <p class="text-sm leading-relaxed">{{ incident.resolution }}</p>
+      </div>
+    </div>
+  </div>
+
+  {# ── Timeline ── #}
+  <div class="card-obsidian p-4 animate-slide-up animate-delay-3">
+    <h2 class="text-sm font-semibold mb-4 opacity-70">Incident Timeline</h2>
+    {% with timeline=incident.timeline %}
+      {% include "components/displays/timeline.html" %}
+    {% endwith %}
+  </div>
+
+  {# ── Tags & Postmortem ── #}
+  <div class="flex flex-wrap items-center gap-4 animate-slide-up animate-delay-4">
+    <div class="flex flex-wrap gap-1">
+      {% for tag in incident.tags %}
+      <span class="badge badge-sm badge-ghost">{{ tag }}</span>
+      {% endfor %}
+    </div>
+    {% if incident.postmortem_id %}
+    <a href="/postmortems/{{ incident.postmortem_id }}" class="btn btn-sm btn-outline btn-accent gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+      View Postmortem ({{ incident.postmortem_id }})
+    </a>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

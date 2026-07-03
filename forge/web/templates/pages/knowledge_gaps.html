@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}Knowledge Gaps{% endblock %}
+
+{% block content %}
+<div class="p-4 lg:p-6 max-w-6xl mx-auto space-y-6">
+
+  {# ── Page Header ── #}
+  <div class="flex items-center justify-between animate-fade-in">
+    <div>
+      <h1 class="text-2xl font-bold">Knowledge Gap Analysis</h1>
+      <p class="text-sm opacity-50 mt-1">Identifying missing documentation and recurring patterns</p>
+    </div>
+    <button
+      hx-post="/api/gaps/detect"
+      hx-target="#gaps-results"
+      hx-swap="innerHTML"
+      class="btn btn-primary btn-sm gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+      Re-scan
+      <span class="loading loading-spinner loading-xs htmx-indicator"></span>
+    </button>
+  </div>
+
+  {# ── Summary Cards ── #}
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 animate-slide-up animate-delay-1">
+    <div class="metric-card">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium uppercase tracking-wider opacity-60 mb-1">Missing Postmortems</p>
+          <p class="text-3xl font-bold text-error">{{ missing_postmortems | length }}</p>
+          <p class="text-xs opacity-50 mt-1">incidents without documentation</p>
+        </div>
+        <div class="p-3 rounded-lg bg-error/10">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+        </div>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium uppercase tracking-wider opacity-60 mb-1">Missing Runbooks</p>
+          <p class="text-3xl font-bold text-warning">{{ missing_runbooks | length }}</p>
+          <p class="text-xs opacity-50 mt-1">services without runbooks</p>
+        </div>
+        <div class="p-3 rounded-lg bg-warning/10">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+        </div>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium uppercase tracking-wider opacity-60 mb-1">Recurring Patterns</p>
+          <p class="text-3xl font-bold text-accent">{{ recurring_patterns | length }}</p>
+          <p class="text-xs opacity-50 mt-1">patterns appearing multiple times</p>
+        </div>
+        <div class="p-3 rounded-lg bg-accent/10">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Two Column Layout ── #}
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    {# ── Missing Postmortems ── #}
+    <div class="card-obsidian p-4 animate-slide-up animate-delay-2">
+      <h2 class="text-sm font-semibold mb-3 flex items-center gap-2">
+        <span class="text-error">●</span>
+        Incidents Without Postmortems
+      </h2>
+      {% if missing_postmortems %}
+      <div class="space-y-2">
+        {% for inc in missing_postmortems %}
+        <a href="/incidents/{{ inc.id }}" class="flex items-center justify-between p-2 rounded-lg hover:bg-base-300/30 transition-colors group">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono opacity-50">{{ inc.id }}</span>
+            <span class="text-sm group-hover:text-primary transition-colors">{{ inc.title[:60] }}{% if inc.title | length > 60 %}...{% endif %}</span>
+          </div>
+          <span class="badge badge-sm
+            {% if inc.severity == 'P1' %}badge-p1
+            {% elif inc.severity == 'P2' %}badge-p2
+            {% elif inc.severity == 'P3' %}badge-p3
+            {% else %}badge-p4{% endif %}">
+            {{ inc.severity }}
+          </span>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-sm text-success opacity-70">All incidents have postmortems!</p>
+      {% endif %}
+    </div>
+
+    {# ── Recurring Patterns ── #}
+    <div class="card-obsidian p-4 animate-slide-up animate-delay-3">
+      <h2 class="text-sm font-semibold mb-3 flex items-center gap-2">
+        <span class="text-accent">●</span>
+        Recurring Patterns
+      </h2>
+      {% if recurring_patterns %}
+      <div class="space-y-3">
+        {% for pattern in recurring_patterns %}
+        <div class="p-3 rounded-lg bg-base-300/30">
+          <div class="flex items-center justify-between mb-1">
+            <p class="text-sm font-medium">{{ pattern.pattern }}</p>
+            <span class="badge badge-xs badge-warning/20 text-warning">{{ pattern.occurrences }}x</span>
+          </div>
+          {% if pattern.incidents is defined %}
+          <div class="flex gap-1 mt-1">
+            {% for inc_id in pattern.incidents %}
+            <a href="/incidents/{{ inc_id }}" class="badge badge-xs badge-ghost hover:bg-base-100">{{ inc_id }}</a>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-sm opacity-50">No recurring patterns detected.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {# ── Recommendations ── #}
+  <div class="card-obsidian p-4 animate-slide-up animate-delay-4">
+    <h2 class="text-sm font-semibold mb-4 flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+      Prioritized Recommendations
+    </h2>
+    {% if recommendations %}
+    <div class="space-y-2">
+      {% for rec in recommendations %}
+      <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-base-300/30 transition-colors">
+        <span class="badge badge-sm flex-shrink-0 mt-0.5
+          {% if rec.priority == 'high' %}priority-high
+          {% elif rec.priority == 'medium' %}priority-medium
+          {% else %}priority-low{% endif %}">
+          {{ rec.priority }}
+        </span>
+        <div class="flex-1">
+          <p class="text-sm font-medium">{{ rec.action }}</p>
+          {% if rec.rationale %}
+          <p class="text-xs opacity-50 mt-0.5">{{ rec.rationale }}</p>
+          {% endif %}
+        </div>
+        {% if rec.effort %}
+        <span class="badge badge-xs badge-ghost flex-shrink-0">
+          {{ rec.effort }} effort
+        </span>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-sm opacity-50">No recommendations at this time.</p>
+    {% endif %}
+  </div>
+
+  {# ── Missing Runbooks ── #}
+  {% if missing_runbooks %}
+  <div class="card-obsidian p-4 animate-slide-up animate-delay-5">
+    <h2 class="text-sm font-semibold mb-3 flex items-center gap-2">
+      <span class="text-warning">●</span>
+      Services Without Runbooks
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+      {% for svc in missing_runbooks %}
+      <div class="p-2 rounded-lg bg-base-300/30 flex items-center gap-2">
+        <span class="status-dot status-dot-degraded"></span>
+        <span class="text-sm">{{ svc.name }}</span>
+        <span class="badge badge-xs badge-ghost ml-auto">{{ svc.team }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# ── HTMX Results Container ── #}
+  <div id="gaps-results"></div>
+
+</div>
+{% endblock %}

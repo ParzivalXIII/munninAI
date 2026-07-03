@@ -1,0 +1,42 @@
+{# Alert Input Form Component #}
+
+<form x-ref="alertForm" @submit.prevent="submitAlert()" class="space-y-4">
+  <div>
+    <label for="alert_text" class="block text-sm font-medium mb-2 opacity-70">
+      Alert / Incident Description
+    </label>
+    <textarea
+      id="alert_text"
+      name="alert_text"
+      x-model="alertText"
+      class="textarea textarea-bordered w-full bg-base-300 border-obsidian focus:border-primary focus:outline-none min-h-[120px] text-sm"
+      placeholder="e.g., HTTP 500 errors on payments-service, 45% error rate, latency spike to 15s..."
+      required
+    ></textarea>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <div>
+      <label for="severity" class="block text-xs font-medium mb-1 opacity-50">Severity</label>
+      <select id="severity" name="severity" x-model="severity" class="select select-bordered select-sm bg-base-300 border-obsidian text-sm">
+        <option value="P1">P1 — Critical</option>
+        <option value="P2">P2 — High</option>
+        <option value="P3">P3 — Medium</option>
+        <option value="P4">P4 — Low</option>
+      </select>
+    </div>
+
+    <div class="flex-1"></div>
+
+    <button type="submit" class="btn btn-primary btn-sm gap-2" :disabled="loading || !alertText.trim()">
+      <span x-show="!loading" class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+        Diagnose
+      </span>
+      <span x-show="loading" class="flex items-center gap-2">
+        <span class="loading loading-spinner loading-sm"></span>
+        Analyzing...
+      </span>
+    </button>
+  </div>
+</form>

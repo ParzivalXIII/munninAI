@@ -1,0 +1,22 @@
+{# Metric Card Component #}
+{# Usage: {% include "components/cards/metric_card.html" with context %} #}
+{# Required: card_title, card_value, card_icon (optional), card_color (optional), card_subtitle (optional) #}
+
+<div class="metric-card animate-slide-up {% if card_delay %}animate-delay-{{ card_delay }}{% endif %}">
+  <div class="flex items-start justify-between">
+    <div>
+      <p class="text-xs font-medium uppercase tracking-wider opacity-60 mb-1">{{ card_title }}</p>
+      <p class="text-3xl font-bold {% if card_color == 'primary' %}text-primary text-glow-primary{% elif card_color == 'success' %}text-success text-glow-success{% elif card_color == 'warning' %}text-warning text-glow-warning{% elif card_color == 'error' %}text-error text-glow-error{% else %}text-base-content{% endif %}">
+        {{ card_value }}
+      </p>
+      {% if card_subtitle %}
+      <p class="text-xs mt-1 opacity-50">{{ card_subtitle }}</p>
+      {% endif %}
+    </div>
+    {% if card_icon %}
+    <div class="p-2 rounded-lg {% if card_color == 'primary' %}bg-primary/10{% elif card_color == 'success' %}bg-success/10{% elif card_color == 'warning' %}bg-warning/10{% elif card_color == 'error' %}bg-error/10{% else %}bg-base-300{% endif %}">
+      {{ card_icon | safe }}
+    </div>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,35 @@
+{# Postmortem Card Component #}
+{# Required: postmortem #}
+
+<a href="/postmortems/{{ postmortem.id }}" class="card-obsidian block p-4 hover:no-underline">
+  <div class="flex items-start justify-between gap-3 mb-2">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-xs font-mono opacity-50">{{ postmortem.id }}</span>
+        <span class="badge badge-sm
+          {% if postmortem.severity == 'P1' %}badge-p1
+          {% elif postmortem.severity == 'P2' %}badge-p2
+          {% elif postmortem.severity == 'P3' %}badge-p3
+          {% else %}badge-p4{% endif %}">
+          {{ postmortem.severity }}
+        </span>
+      </div>
+      <h3 class="font-semibold text-sm">{{ postmortem.title }}</h3>
+    </div>
+    <span class="text-xs opacity-40 flex-shrink-0">{{ postmortem.date }}</span>
+  </div>
+  <p class="text-xs opacity-60 line-clamp-2 mb-3">{{ postmortem.summary }}</p>
+  <div class="flex items-center gap-4 text-xs">
+    <span class="opacity-50">
+      Incident: <span class="font-mono">{{ postmortem.incident_id }}</span>
+    </span>
+    <span class="opacity-50">
+      Author: {{ postmortem.author }}
+    </span>
+    {% set completed = postmortem.action_items | selectattr('status', 'equalto', 'completed') | list | length %}
+    {% set total = postmortem.action_items | length %}
+    <span class="{% if completed == total %}text-success{% else %}text-warning{% endif %}">
+      {{ completed }}/{{ total }} actions
+    </span>
+  </div>
+</a>

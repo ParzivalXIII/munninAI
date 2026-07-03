@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Incidents{% endblock %}
+
+{% block content %}
+<div class="p-4 lg:p-6 max-w-7xl mx-auto space-y-6">
+
+  {# ── Page Header ── #}
+  <div class="animate-fade-in">
+    <h1 class="text-2xl font-bold">Incidents</h1>
+    <p class="text-sm opacity-50 mt-1">{{ incidents | length }} incident{{ 's' if incidents | length != 1 else '' }} found</p>
+  </div>
+
+  {# ── Filters ── #}
+  <div class="card-obsidian p-4 animate-slide-up animate-delay-1">
+    <form method="get" action="/incidents" class="flex flex-wrap items-end gap-3">
+      <div>
+        <label class="block text-xs font-medium opacity-50 mb-1">Severity</label>
+        <select name="severity" class="select select-bordered select-sm bg-base-300 border-obsidian text-xs">
+          <option value="">All</option>
+          {% for s in severities %}
+          <option value="{{ s }}" {% if severity == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium opacity-50 mb-1">Status</label>
+        <select name="status" class="select select-bordered select-sm bg-base-300 border-obsidian text-xs">
+          <option value="">All</option>
+          {% for s in statuses %}
+          <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium opacity-50 mb-1">Service</label>
+        <select name="service" class="select select-bordered select-sm bg-base-300 border-obsidian text-xs">
+          <option value="">All</option>
+          {% for s in services %}
+          <option value="{{ s }}" {% if service == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+      {% if severity or status or service %}
+      <a href="/incidents" class="btn btn-ghost btn-sm">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+
+  {# ── Incident Table ── #}
+  {% if incidents %}
+  <div class="card-obsidian overflow-hidden animate-slide-up animate-delay-2">
+    <div class="overflow-x-auto">
+      <table class="table-obsidian">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Severity</th>
+            <th>Services</th>
+            <th>Duration</th>
+            <th>Impact</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for incident in incidents %}
+          <tr class="cursor-pointer hover:bg-base-300/30" onclick="window.location='/incidents/{{ incident.id }}'">
+            <td class="font-mono text-xs">{{ incident.id }}</td>
+            <td>
+              <div class="font-medium text-sm max-w-xs truncate">{{ incident.title }}</div>
+            </td>
+            <td>
+              <span class="badge badge-sm
+                {% if incident.severity == 'P1' %}badge-p1
+                {% elif incident.severity == 'P2' %}badge-p2
+                {% elif incident.severity == 'P3' %}badge-p3
+                {% else %}badge-p4{% endif %}">
+                {{ incident.severity }}
+              </span>
+            </td>
+            <td>
+              <div class="flex flex-wrap gap-1">
+                {% for svc in incident.affected_services[:2] %}
+                <span class="badge badge-xs badge-ghost">{{ svc }}</span>
+                {% endfor %}
+                {% if incident.affected_services | length > 2 %}
+                <span class="badge badge-xs badge-ghost">+{{ incident.affected_services | length - 2 }}</span>
+                {% endif %}
+              </div>
+            </td>
+            <td class="text-sm">{{ incident.duration_minutes }}m</td>
+            <td class="text-sm">
+              <span class="{% if incident.impact.revenue_impact_usd > 50000 %}text-error{% elif incident.impact.revenue_impact_usd > 10000 %}text-warning{% else %}opacity-60{% endif %}">
+                ${{ '{:,}'.format(incident.impact.revenue_impact_usd | default(0)) }}
+              </span>
+            </td>
+            <td class="text-xs opacity-50">{{ incident.timestamp[:10] if incident.timestamp else '' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+    {% with empty_title='No incidents found', empty_description='Try adjusting your filters to see more results.' %}
+      {% include "components/feedback/empty_state.html" %}
+    {% endwith %}
+  {% endif %}
+
+</div>
+{% endblock %}

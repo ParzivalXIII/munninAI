@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="p-4 lg:p-6 max-w-7xl mx-auto space-y-6">
+
+  {# ── Page Header ── #}
+  <div class="flex items-center justify-between animate-fade-in">
+    <div>
+      <h1 class="text-2xl font-bold">Dashboard</h1>
+      <p class="text-sm opacity-50 mt-1">DevOps Intelligence Overview</p>
+    </div>
+    <div class="flex items-center gap-2"
+         hx-get="/api/dashboard/metrics"
+         hx-trigger="every 30s"
+         hx-swap="innerHTML">
+      <button hx-get="/api/dashboard/metrics" hx-target="#metrics-refresh" hx-swap="innerHTML" class="btn btn-ghost btn-xs btn-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+      </button>
+    </div>
+  </div>
+
+  {# ── Metric Cards ── #}
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    {% with card_title='Total Incidents', card_value=total_incidents, card_color='primary', card_delay='1',
+       card_icon='<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>',
+       card_subtitle=resolved_incidents ~ ' resolved' %}
+      {% include "components/cards/metric_card.html" %}
+    {% endwith %}
+
+    {% with card_title='Avg MTTR', card_value=avg_mttr ~ 'm', card_color='accent', card_delay='2',
+       card_icon='<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+       card_subtitle='mean time to resolve' %}
+      {% include "components/cards/metric_card.html" %}
+    {% endwith %}
+
+    {% with card_title='Revenue Impact', card_value='$' ~ '{:,}'.format(total_revenue_impact), card_color='error', card_delay='3',
+       card_icon='<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+       card_subtitle=total_users_affected | string ~ ' users affected' %}
+      {% include "components/cards/metric_card.html" %}
+    {% endwith %}
+
+    {% with card_title='Knowledge Gaps', card_value=missing_postmortems_count + missing_runbooks_count, card_color='warning', card_delay='4',
+       card_icon='<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>',
+       card_subtitle=missing_postmortems_count | string ~ ' missing PMs, ' ~ missing_runbooks_count | string ~ ' missing runbooks' %}
+      {% include "components/cards/metric_card.html" %}
+    {% endwith %}
+  </div>
+
+  {# ── Severity Breakdown ── #}
+  <div class="card-obsidian p-4 animate-slide-up animate-delay-2">
+    <h2 class="text-sm font-semibold mb-3 opacity-70">Incidents by Severity</h2>
+    <div class="flex items-end gap-3 h-24">
+      {% for sev, count in severity_counts.items() %}
+      <div class="flex-1 flex flex-col items-center gap-1">
+        <span class="text-xs font-bold
+          {% if sev == 'P1' %}text-error
+          {% elif sev == 'P2' %}text-warning
+          {% elif sev == 'P3' %}text-accent
+          {% else %}text-info{% endif %}">
+          {{ count }}
+        </span>
+        <div class="w-full rounded-t-md
+          {% if sev == 'P1' %}bg-error/30
+          {% elif sev == 'P2' %}bg-warning/30
+          {% elif sev == 'P3' %}bg-accent/30
+          {% else %}bg-info/30{% endif %}"
+          style="height: {% if severity_counts.values() | max > 0 %}{{ (count / severity_counts.values() | max * 100) | round(0) | int }}%{% else %}0%{% endif %}; min-height: 4px;">
+        </div>
+        <span class="text-xs opacity-50">{{ sev }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# ── Two Column Layout ── #}
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    {# ── Recent Incidents ── #}
+    <div class="animate-slide-up animate-delay-3">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-semibold opacity-70">Recent Incidents</h2>
+        <a href="/incidents" class="text-xs text-primary hover:underline">View all</a>
+      </div>
+      <div class="space-y-2">
+        {% for incident in recent_incidents %}
+          {% with incident=incident %}
+            {% include "components/cards/incident_card.html" %}
+          {% endwith %}
+        {% endfor %}
+        {% if not recent_incidents %}
+          {% include "components/feedback/empty_state.html" with context %}
+        {% endif %}
+      </div>
+    </div>
+
+    {# ── Service Health ── #}
+    <div class="animate-slide-up animate-delay-4">
+      <h2 class="text-sm font-semibold opacity-70 mb-3">Service Health</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {% for service in services %}
+          {% with service=service, incident_count=service_incident_counts.get(service.name, 0) %}
+            {% include "components/cards/service_card.html" %}
+          {% endwith %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {# ── Quick Actions ── #}
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-slide-up animate-delay-5">
+    <a href="/incidents/respond" class="card-obsidian p-4 flex items-center gap-3 hover:border-primary/30 transition-all group">
+      <div class="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+      </div>
+      <div>
+        <p class="font-semibold text-sm">Respond to Incident</p>
+        <p class="text-xs opacity-50">AI-powered diagnosis</p>
+      </div>
+    </a>
+    <a href="/postmortems" class="card-obsidian p-4 flex items-center gap-3 hover:border-accent/30 transition-all group">
+      <div class="p-2 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+      </div>
+      <div>
+        <p class="font-semibold text-sm">View Postmortems</p>
+        <p class="text-xs opacity-50">{{ postmortems_count }} reports</p>
+      </div>
+    </a>
+    <a href="/gaps" class="card-obsidian p-4 flex items-center gap-3 hover:border-warning/30 transition-all group">
+      <div class="p-2 rounded-lg bg-warning/10 group-hover:bg-warning/20 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+      </div>
+      <div>
+        <p class="font-semibold text-sm">Knowledge Gaps</p>
+        <p class="text-xs opacity-50">{{ missing_postmortems_count + missing_runbooks_count }} gaps found</p>
+      </div>
+    </a>
+  </div>
+
+</div>
+{% endblock %}

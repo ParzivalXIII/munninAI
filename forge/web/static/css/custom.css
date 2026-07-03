@@ -1,0 +1,491 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   MunninAI — Obsidian Intelligence Theme
+   Custom CSS with neon glow utilities, animations, and component styles
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── DaisyUI 5 Theme: Obsidian Intelligence ─────────────────────────── */
+@theme {
+  --color-base-100: oklch(0.07 0.02 270);
+  --color-base-200: oklch(0.11 0.02 270);
+  --color-base-300: oklch(0.15 0.02 270);
+  --color-base-content: oklch(0.90 0.01 270);
+
+  --color-primary: #06b6d4;
+  --color-primary-content: oklch(0.10 0.02 270);
+
+  --color-secondary: #8b5cf6;
+  --color-secondary-content: #ffffff;
+
+  --color-accent: #f59e0b;
+  --color-accent-content: oklch(0.10 0.02 270);
+
+  --color-neutral: oklch(0.19 0.02 270);
+  --color-neutral-content: oklch(0.85 0.01 270);
+
+  --color-info: #0ea5e9;
+  --color-info-content: #ffffff;
+
+  --color-success: #10b981;
+  --color-success-content: #ffffff;
+
+  --color-warning: #f97316;
+  --color-warning-content: #ffffff;
+
+  --color-error: #ef4444;
+  --color-error-content: #ffffff;
+
+  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+}
+
+/* ── Base Styles ────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family-sans);
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
+  min-height: 100vh;
+}
+
+/* ── Neon Glow Utilities ────────────────────────────────────────────── */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.4),
+              0 0 40px rgba(6, 182, 212, 0.15);
+}
+
+.glow-success {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4),
+              0 0 40px rgba(16, 185, 129, 0.15);
+}
+
+.glow-warning {
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.4),
+              0 0 40px rgba(249, 115, 22, 0.15);
+}
+
+.glow-error {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4),
+              0 0 40px rgba(239, 68, 68, 0.15);
+}
+
+.glow-info {
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.4),
+              0 0 40px rgba(14, 165, 233, 0.15);
+}
+
+.glow-accent {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4),
+              0 0 40px rgba(245, 158, 11, 0.15);
+}
+
+/* Text glow variants */
+.text-glow-primary {
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.6),
+               0 0 20px rgba(6, 182, 212, 0.3);
+}
+
+.text-glow-success {
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.6),
+               0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.text-glow-warning {
+  text-shadow: 0 0 10px rgba(249, 115, 22, 0.6),
+               0 0 20px rgba(249, 115, 22, 0.3);
+}
+
+.text-glow-error {
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.6),
+               0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+/* ── Severity Badge Colors ──────────────────────────────────────────── */
+.badge-p1 {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+}
+
+.badge-p2 {
+  background-color: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.25);
+}
+
+.badge-p3 {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+}
+
+.badge-p4 {
+  background-color: rgba(14, 165, 233, 0.15);
+  color: #0ea5e9;
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.2);
+}
+
+/* ── Card Styles ────────────────────────────────────────────────────── */
+.card-obsidian {
+  background-color: var(--color-base-200);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-box);
+  transition: all 0.2s ease;
+}
+
+.card-obsidian:hover {
+  border-color: rgba(6, 182, 212, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3),
+              0 0 15px rgba(6, 182, 212, 0.08);
+}
+
+/* ── Metric Card ────────────────────────────────────────────────────── */
+.metric-card {
+  background: linear-gradient(135deg, var(--color-base-200) 0%, var(--color-base-300) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-box);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.metric-card:hover::before {
+  opacity: 1;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Chat Interface ─────────────────────────────────────────────────── */
+.chat-bubble-agent {
+  background: linear-gradient(135deg, var(--color-base-300) 0%, var(--color-base-200) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.15);
+  border-radius: var(--radius-box);
+}
+
+.chat-bubble-user {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0.05) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: var(--radius-box);
+}
+
+/* ── Timeline ───────────────────────────────────────────────────────── */
+.timeline-item {
+  position: relative;
+  padding-left: 2rem;
+  padding-bottom: 1.5rem;
+  border-left: 2px solid rgba(6, 182, 212, 0.2);
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+}
+
+.timeline-item:last-child {
+  border-left-color: transparent;
+}
+
+.timeline-item.timeline-item-critical::before {
+  background-color: var(--color-error);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+/* ── Animations ─────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.5),
+                0 0 50px rgba(6, 182, 212, 0.2);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.4s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Staggered animation delays */
+.animate-delay-1 { animation-delay: 0.1s; animation-fill-mode: both; }
+.animate-delay-2 { animation-delay: 0.2s; animation-fill-mode: both; }
+.animate-delay-3 { animation-delay: 0.3s; animation-fill-mode: both; }
+.animate-delay-4 { animation-delay: 0.4s; animation-fill-mode: both; }
+.animate-delay-5 { animation-delay: 0.5s; animation-fill-mode: both; }
+
+/* ── Skeleton Loading ───────────────────────────────────────────────── */
+.skeleton-obsidian {
+  background: linear-gradient(
+    90deg,
+    var(--color-base-300) 25%,
+    var(--color-base-200) 50%,
+    var(--color-base-300) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-field);
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────────── */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  border-radius: var(--radius-field);
+  color: var(--color-base-content);
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.sidebar-link:hover {
+  opacity: 1;
+  background-color: rgba(6, 182, 212, 0.08);
+  color: var(--color-primary);
+}
+
+.sidebar-link.active {
+  opacity: 1;
+  background-color: rgba(6, 182, 212, 0.12);
+  color: var(--color-primary);
+  border-left: 2px solid var(--color-primary);
+}
+
+/* ── Navbar ─────────────────────────────────────────────────────────── */
+.navbar-obsidian {
+  background-color: rgba(18, 18, 26, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Confidence Meter ───────────────────────────────────────────────── */
+.confidence-bar {
+  height: 6px;
+  border-radius: 3px;
+  background-color: var(--color-base-300);
+  overflow: hidden;
+}
+
+.confidence-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease-out;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-base-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-base-300);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.3);
+}
+
+/* ── HTMX Loading Indicator ─────────────────────────────────────────── */
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+  display: inline-flex;
+}
+
+/* ── Table Styles ───────────────────────────────────────────────────── */
+.table-obsidian {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-obsidian thead th {
+  background-color: var(--color-base-300);
+  color: var(--color-base-content);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.table-obsidian tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.table-obsidian tbody tr:hover {
+  background-color: rgba(6, 182, 212, 0.04);
+}
+
+.table-obsidian tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.875rem;
+}
+
+/* ── Status Indicator ───────────────────────────────────────────────── */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-dot-healthy {
+  background-color: var(--color-success);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.status-dot-degraded {
+  background-color: var(--color-warning);
+  box-shadow: 0 0 6px rgba(249, 115, 22, 0.5);
+}
+
+.status-dot-down {
+  background-color: var(--color-error);
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+}
+
+/* ── Tooltip ────────────────────────────────────────────────────────── */
+.raven-tooltip {
+  background: linear-gradient(135deg, var(--color-base-300) 0%, var(--color-base-200) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: var(--radius-box);
+  padding: 1rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4),
+              0 0 15px rgba(6, 182, 212, 0.1);
+}
+
+/* ── Priority Badge ─────────────────────────────────────────────────── */
+.priority-high {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.priority-medium {
+  background-color: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+}
+
+.priority-low {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+/* ── Demo Step ──────────────────────────────────────────────────────── */
+.demo-step-active {
+  background-color: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.demo-step-complete {
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* ── Utility ────────────────────────────────────────────────────────── */
+.border-obsidian {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.bg-gradient-obsidian {
+  background: linear-gradient(135deg, var(--color-base-200) 0%, var(--color-base-100) 100%);
+}
+
+.text-gradient-primary {
+  background: linear-gradient(135deg, #06b6d4, #0ea5e9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

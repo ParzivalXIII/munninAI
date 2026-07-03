@@ -1,0 +1,9 @@
+{# Loading Component #}
+{# Optional: loading_text, loading_size (lg, md, sm) #}
+
+<div class="flex flex-col items-center justify-center py-8 gap-3 animate-fade-in">
+  <span class="loading loading-infinity {% if loading_size | default('lg') == 'lg' %}loading-lg{% else %}loading-md{% endif %} text-primary"></span>
+  {% if loading_text is defined and loading_text %}
+  <p class="text-sm opacity-60">{{ loading_text }}</p>
+  {% endif %}
+</div>

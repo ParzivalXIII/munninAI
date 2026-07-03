@@ -1,0 +1,114 @@
+{# Diagnosis Display Component #}
+{# Required: diagnosis, alert_text #}
+
+<div class="animate-slide-up space-y-4">
+  {# Diagnosis Summary #}
+  <div class="chat-bubble-agent p-4">
+    <div class="flex items-center gap-2 mb-3">
+      <img src="/static/images/raven.svg" alt="" class="h-5 w-5">
+      <span class="text-sm font-semibold text-primary">MunninAI Diagnosis</span>
+      {% if diagnosis.confidence is defined %}
+      <span class="badge badge-xs badge-ghost ml-auto">
+        {{ (diagnosis.confidence * 100) | round(0) | int }}% confidence
+      </span>
+      {% endif %}
+    </div>
+
+    <p class="text-sm leading-relaxed mb-4">{{ diagnosis.diagnosis }}</p>
+
+    {# Confidence Bar #}
+    {% if diagnosis.confidence is defined %}
+    <div class="mb-4">
+      <div class="flex justify-between text-xs opacity-50 mb-1">
+        <span>Confidence</span>
+        <span>{{ (diagnosis.confidence * 100) | round(0) | int }}%</span>
+      </div>
+      <div class="confidence-bar">
+        <div class="confidence-bar-fill {% if diagnosis.confidence >= 0.8 %}bg-success{% elif diagnosis.confidence >= 0.5 %}bg-warning{% else %}bg-error{% endif %}"
+             style="width: {{ (diagnosis.confidence * 100) | round(0) | int }}%"></div>
+      </div>
+    </div>
+    {% endif %}
+
+    {# Root Cause #}
+    {% if diagnosis.root_cause %}
+    <div class="bg-base-100/50 rounded-lg p-3 mb-4">
+      <p class="text-xs font-semibold uppercase tracking-wider text-warning mb-1">Root Cause</p>
+      <p class="text-sm">{{ diagnosis.root_cause }}</p>
+    </div>
+    {% endif %}
+
+    {# Resolution Steps #}
+    {% if diagnosis.resolution_steps %}
+    <div class="bg-base-100/50 rounded-lg p-3 mb-4">
+      <p class="text-xs font-semibold uppercase tracking-wider text-success mb-2">Recommended Steps</p>
+      <ol class="list-decimal list-inside space-y-1">
+        {% for step in diagnosis.resolution_steps %}
+        <li class="text-sm">{{ step }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+    {% endif %}
+
+    {# Similar Incidents #}
+    {% if diagnosis.similar_incidents %}
+    <div class="bg-base-100/50 rounded-lg p-3">
+      <p class="text-xs font-semibold uppercase tracking-wider text-info mb-2">Similar Historical Incidents</p>
+      <div class="space-y-2">
+        {% for sim in diagnosis.similar_incidents %}
+        <a href="/incidents/{{ sim.id }}" class="flex items-center justify-between p-2 rounded-lg hover:bg-base-300/50 transition-colors">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono opacity-50">{{ sim.id }}</span>
+            <span class="text-sm">{{ sim.title }}</span>
+          </div>
+          {% if sim.similarity is defined %}
+          <span class="badge badge-xs {% if sim.similarity >= 0.8 %}badge-success/20 text-success{% elif sim.similarity >= 0.5 %}badge-warning/20 text-warning{% else %}badge-ghost{% endif %}">
+            {{ (sim.similarity * 100) | round(0) | int }}% match
+          </span>
+          {% endif %}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  {# Action Buttons #}
+  <div class="flex items-center gap-3 ml-12" x-data="{ showContinue: false, showResolve: false, continueInput: '', resolveInput: '' }">
+    <button @click="showContinue = !showContinue" class="btn btn-sm btn-outline btn-info gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+      Continue Investigation
+    </button>
+    <button @click="showResolve = !showResolve" class="btn btn-sm btn-outline btn-success gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+      Resolve Incident
+    </button>
+  </div>
+
+  {# Continue Investigation Form #}
+  <div x-show="showContinue" x-transition class="ml-12 mt-2 animate-slide-up">
+    <div class="chat-bubble-user p-3">
+      <form @submit.prevent="continueInvestigation(continueInput); continueInput = ''; showContinue = false;">
+        <textarea x-model="continueInput" class="textarea textarea-bordered w-full bg-base-100/50 border-obsidian text-sm min-h-[80px]" placeholder="Add new findings, e.g., 'Database logs show connection pool at 100%'..."></textarea>
+        <div class="flex justify-end mt-2">
+          <button type="submit" class="btn btn-sm btn-info" :disabled="!continueInput.trim()">Submit Finding</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {# Resolve Incident Form #}
+  <div x-show="showResolve" x-transition class="ml-12 mt-2 animate-slide-up">
+    <div class="chat-bubble-user p-3 border-success/20">
+      <form @submit.prevent="resolveIncident(resolveInput); resolveInput = ''; showResolve = false;">
+        <textarea x-model="resolveInput" class="textarea textarea-bordered w-full bg-base-100/50 border-obsidian text-sm min-h-[80px]" placeholder="Describe the resolution, e.g., 'Increased pool size to 100, deployed circuit breaker'..."></textarea>
+        <div class="flex justify-end mt-2">
+          <button type="submit" class="btn btn-sm btn-success" :disabled="!resolveInput.trim()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            Resolve & Bridge Memory
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

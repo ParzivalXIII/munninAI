@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Postmortems{% endblock %}
+
+{% block content %}
+<div class="p-4 lg:p-6 max-w-5xl mx-auto space-y-6">
+
+  {# ── Page Header ── #}
+  <div class="flex items-center justify-between animate-fade-in">
+    <div>
+      <h1 class="text-2xl font-bold">Postmortems</h1>
+      <p class="text-sm opacity-50 mt-1">{{ postmortems | length }} postmortem report{{ 's' if postmortems | length != 1 else '' }}</p>
+    </div>
+  </div>
+
+  {# ── Postmortem List ── #}
+  {% if postmortems %}
+  <div class="space-y-3">
+    {% for pm in postmortems %}
+      {% with postmortem=pm %}
+        {% include "components/cards/postmortem_card.html" %}
+      {% endwith %}
+    {% endfor %}
+  </div>
+  {% else %}
+    {% with empty_title='No postmortems yet', empty_description='Postmortems will appear here once incidents are resolved and reports are generated.' %}
+      {% include "components/feedback/empty_state.html" %}
+    {% endwith %}
+  {% endif %}
+
+</div>
+{% endblock %}

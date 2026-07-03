@@ -1,0 +1,16 @@
+{# Error State Component #}
+{# Optional: error_message, error_code #}
+
+<div class="flex flex-col items-center justify-center py-12 px-4 animate-fade-in">
+  <div class="p-3 rounded-full bg-error/10 mb-4">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+  </div>
+  <h3 class="text-lg font-semibold text-error mb-1">{{ error_title | default('Something went wrong') }}</h3>
+  <p class="text-sm opacity-60 text-center max-w-md">{{ error_message | default('An unexpected error occurred. Please try again.') }}</p>
+  {% if error_code is defined and error_code %}
+  <p class="text-xs font-mono opacity-30 mt-2">Error: {{ error_code }}</p>
+  {% endif %}
+  <button onclick="window.location.reload()" class="btn btn-ghost btn-sm mt-4">Try Again</button>
+</div>

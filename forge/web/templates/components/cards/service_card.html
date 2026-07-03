@@ -1,0 +1,36 @@
+{# Service Card Component #}
+{# Required: service, incident_count (optional) #}
+
+<div class="card-obsidian p-4">
+  <div class="flex items-start justify-between mb-2">
+    <div class="flex items-center gap-2">
+      <span class="status-dot {% if incident_count | default(0) > 2 %}status-dot-degraded{% else %}status-dot-healthy{% endif %}"></span>
+      <h3 class="font-semibold text-sm">{{ service.name }}</h3>
+    </div>
+    <span class="badge badge-xs {% if service.criticality == 'tier-1' %}badge-error/20 text-error{% elif service.criticality == 'tier-2' %}badge-warning/20 text-warning{% else %}badge-info/20 text-info{% endif %}">
+      {{ service.criticality | default('tier-2') }}
+    </span>
+  </div>
+  <p class="text-xs opacity-60 mb-3 line-clamp-2">{{ service.description }}</p>
+  <div class="flex items-center justify-between text-xs">
+    <div class="flex items-center gap-2">
+      <span class="opacity-50">{{ service.language | default('') }}</span>
+      <span class="opacity-30">·</span>
+      <span class="opacity-50">{{ service.replicas | default(0) }} replicas</span>
+    </div>
+    {% if incident_count is defined and incident_count is not none %}
+    <span class="{% if incident_count > 2 %}text-error{% elif incident_count > 0 %}text-warning{% else %}text-success{% endif %}">
+      {{ incident_count }} incident{{ 's' if incident_count != 1 else '' }}
+    </span>
+    {% endif %}
+  </div>
+  {% if service.runbook %}
+  <div class="mt-2 pt-2 border-t border-obsidian">
+    <span class="text-xs text-success opacity-70">Runbook available</span>
+  </div>
+  {% else %}
+  <div class="mt-2 pt-2 border-t border-obsidian">
+    <span class="text-xs text-warning opacity-70">No runbook</span>
+  </div>
+  {% endif %}
+</div>

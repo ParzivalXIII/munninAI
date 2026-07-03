@@ -1,0 +1,45 @@
+{# Gaps Results Display Component (HTMX) #}
+{# Required: missing_postmortems, missing_runbooks, recurring_patterns, recommendations #}
+
+<div class="animate-fade-in space-y-6">
+  {# Summary Cards #}
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="metric-card">
+      <p class="text-xs font-medium uppercase tracking-wider opacity-60 mb-1">Missing Postmortems</p>
+      <p class="text-3xl font-bold text-error">{{ missing_postmortems | length }}</p>
+    </div>
+    <div class="metric-card">
+      <p class="text-xs font-medium uppercase tracking-wider opacity-60 mb-1">Missing Runbooks</p>
+      <p class="text-3xl font-bold text-warning">{{ missing_runbooks | length }}</p>
+    </div>
+    <div class="metric-card">
+      <p class="text-xs font-medium uppercase tracking-wider opacity-60 mb-1">Recurring Patterns</p>
+      <p class="text-3xl font-bold text-accent">{{ recurring_patterns | length }}</p>
+    </div>
+  </div>
+
+  {# Recommendations #}
+  {% if recommendations %}
+  <div class="card-obsidian p-4">
+    <h3 class="font-semibold text-sm mb-3">Prioritized Recommendations</h3>
+    <div class="space-y-2">
+      {% for rec in recommendations %}
+      <div class="flex items-start gap-3 p-2 rounded-lg hover:bg-base-300/30 transition-colors">
+        <span class="badge badge-sm flex-shrink-0 mt-0.5
+          {% if rec.priority == 'high' %}priority-high
+          {% elif rec.priority == 'medium' %}priority-medium
+          {% else %}priority-low{% endif %}">
+          {{ rec.priority }}
+        </span>
+        <div>
+          <p class="text-sm">{{ rec.action }}</p>
+          {% if rec.rationale %}
+          <p class="text-xs opacity-50 mt-0.5">{{ rec.rationale }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>

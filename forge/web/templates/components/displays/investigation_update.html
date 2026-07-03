@@ -1,0 +1,31 @@
+{# Investigation Update Display Component #}
+{# Required: update, new_info #}
+
+<div class="animate-slide-up">
+  <div class="chat-bubble-agent p-4">
+    <div class="flex items-center gap-2 mb-3">
+      <img src="/static/images/raven.svg" alt="" class="h-5 w-5">
+      <span class="text-sm font-semibold text-info">Investigation Update</span>
+      {% if update.confidence_change is defined %}
+      <span class="badge badge-xs {% if update.confidence_change > 0 %}badge-success/20 text-success{% else %}badge-warning/20 text-warning{% endif %} ml-auto">
+        {% if update.confidence_change > 0 %}+{% endif %}{{ (update.confidence_change * 100) | round(0) | int }}% confidence
+      </span>
+      {% endif %}
+    </div>
+
+    {% if update.updated_diagnosis %}
+    <p class="text-sm leading-relaxed mb-4">{{ update.updated_diagnosis }}</p>
+    {% endif %}
+
+    {% if update.next_steps %}
+    <div class="bg-base-100/50 rounded-lg p-3">
+      <p class="text-xs font-semibold uppercase tracking-wider text-info mb-2">Next Steps</p>
+      <ol class="list-decimal list-inside space-y-1">
+        {% for step in update.next_steps %}
+        <li class="text-sm">{{ step }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+    {% endif %}
+  </div>
+</div>

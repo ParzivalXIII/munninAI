@@ -1,0 +1,11 @@
+{# Timeline Display Component #}
+{# Required: timeline (list of {timestamp, event}) #}
+
+<div class="space-y-0">
+  {% for entry in timeline %}
+  <div class="timeline-item {% if 'critical' in entry.event | lower or 'fail' in entry.event | lower or 'error' in entry.event | lower %}timeline-item-critical{% endif %}">
+    <p class="text-xs font-mono opacity-50">{{ entry.timestamp[11:16] if entry.timestamp | length > 11 else entry.timestamp }}</p>
+    <p class="text-sm mt-0.5">{{ entry.event }}</p>
+  </div>
+  {% endfor %}
+</div>
