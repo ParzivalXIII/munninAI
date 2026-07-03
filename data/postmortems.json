@@ -1,0 +1,514 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "generated_at": "2026-07-02T00:00:00Z",
+    "description": "Post-incident postmortem reports for Acme Corp",
+    "organization": "Acme Corp",
+    "period": "2026-01 to 2026-06"
+  },
+  "postmortems": [
+    {
+      "id": "PM-001",
+      "incident_id": "INC-001",
+      "title": "Payments Service Connection Pool Exhaustion - January 8, 2026",
+      "date": "2026-01-10",
+      "author": "Sarah Chen",
+      "severity": "P1",
+      "summary": "During a flash sale event, the payments service experienced connection pool exhaustion due to insufficient pool size for the traffic volume. This caused HTTP 500 errors on the checkout endpoint, affecting 2,340 users and resulting in $45,000 in lost revenue.",
+      "root_cause_analysis": {
+        "direct_cause": "PostgreSQL connection pool size (max_connections=20) was insufficient for the traffic volume during the flash sale event",
+        "contributing_factors": [
+          "Flash sale traffic was 3x normal volume",
+          "No load testing performed with flash sale traffic patterns",
+          "Connection pool size was set during initial deployment and never reviewed",
+          "No monitoring alerts for connection pool utilization"
+        ],
+        "why_it_happened": "The connection pool size was configured during initial deployment with conservative estimates. As the business grew and flash sales were introduced, the pool size was never re-evaluated. The flash sale on January 8th generated 3x normal traffic, exhausting the pool."
+      },
+      "impact_assessment": {
+        "duration_minutes": 61,
+        "users_affected": 2340,
+        "revenue_impact_usd": 45000,
+        "failed_transactions": 890,
+        "customer_complaints": 156,
+        "data_loss": false
+      },
+      "resolution": {
+        "immediate_action": "Increased connection pool size to 50, added connection timeout of 30s, implemented connection health checks",
+        "long_term_fix": "Implemented connection pool monitoring, added auto-scaling based on pool utilization, established quarterly capacity reviews"
+      },
+      "action_items": [
+        {
+          "id": "AI-001-1",
+          "description": "Increase payments-service connection pool size to 50",
+          "owner": "David Park",
+          "status": "completed",
+          "completed_date": "2026-01-08"
+        },
+        {
+          "id": "AI-001-2",
+          "description": "Add connection pool utilization monitoring and alerts",
+          "owner": "Mike Rodriguez",
+          "status": "completed",
+          "completed_date": "2026-01-12"
+        },
+        {
+          "id": "AI-001-3",
+          "description": "Perform load testing with flash sale traffic patterns",
+          "owner": "Lisa Wang",
+          "status": "completed",
+          "completed_date": "2026-01-20"
+        },
+        {
+          "id": "AI-001-4",
+          "description": "Establish quarterly capacity review process",
+          "owner": "David Park",
+          "status": "completed",
+          "completed_date": "2026-01-25"
+        },
+        {
+          "id": "AI-001-5",
+          "description": "Implement connection pool auto-scaling",
+          "owner": "James Wilson",
+          "status": "completed",
+          "completed_date": "2026-02-01"
+        }
+      ],
+      "lessons_learned": [
+        "Connection pool sizing must be reviewed as traffic patterns change",
+        "Load testing should include peak traffic scenarios like flash sales",
+        "Monitoring alerts for resource utilization prevent cascading failures",
+        "Conservative initial configurations need periodic re-evaluation"
+      ],
+      "preventive_measures": [
+        "Quarterly capacity reviews for all tier-1 services",
+        "Mandatory load testing before marketing campaigns",
+        "Connection pool utilization alerts at 70% and 85% thresholds",
+        "Auto-scaling based on connection pool metrics"
+      ]
+    },
+    {
+      "id": "PM-002",
+      "incident_id": "INC-003",
+      "title": "Order Service Database Deadlock - February 3, 2026",
+      "date": "2026-02-05",
+      "author": "Sarah Chen",
+      "severity": "P1",
+      "summary": "Concurrent updates to the same order row from order-service and inventory-service caused database deadlocks, resulting in order creation failures and inventory update delays. The incident affected 3,400 users and caused $67,000 in lost revenue.",
+      "root_cause_analysis": {
+        "direct_cause": "Concurrent updates to the same order row from order-service and inventory-service caused a deadlock",
+        "contributing_factors": [
+          "No row-level locking implemented",
+          "Queries executed in different order between services",
+          "No deadlock detection or retry logic",
+          "High concurrency during peak hours increased deadlock probability"
+        ],
+        "why_it_happened": "Order-service and inventory-service both update the same order row during order processing. Without proper locking mechanisms, concurrent updates caused deadlocks. The issue was not caught in testing because test scenarios didn't simulate high concurrency."
+      },
+      "impact_assessment": {
+        "duration_minutes": 90,
+        "users_affected": 3400,
+        "revenue_impact_usd": 67000,
+        "failed_transactions": 1200,
+        "customer_complaints": 234,
+        "data_loss": false
+      },
+      "resolution": {
+        "immediate_action": "Implemented row-level locking with SELECT FOR UPDATE, optimized query order, added deadlock detection and retry logic",
+        "long_term_fix": "Redesigned order processing workflow to minimize concurrent updates, implemented optimistic locking for non-critical updates"
+      },
+      "action_items": [
+        {
+          "id": "AI-002-1",
+          "description": "Implement row-level locking with SELECT FOR UPDATE",
+          "owner": "James Wilson",
+          "status": "completed",
+          "completed_date": "2026-02-03"
+        },
+        {
+          "id": "AI-002-2",
+          "description": "Add deadlock detection and retry logic",
+          "owner": "Lisa Wang",
+          "status": "completed",
+          "completed_date": "2026-02-05"
+        },
+        {
+          "id": "AI-002-3",
+          "description": "Optimize query order across services",
+          "owner": "David Park",
+          "status": "completed",
+          "completed_date": "2026-02-08"
+        },
+        {
+          "id": "AI-002-4",
+          "description": "Add concurrency testing to CI/CD pipeline",
+          "owner": "Mike Rodriguez",
+          "status": "completed",
+          "completed_date": "2026-02-15"
+        }
+      ],
+      "lessons_learned": [
+        "Concurrent database updates require proper locking mechanisms",
+        "Query execution order matters in multi-service architectures",
+        "Deadlock detection and retry logic prevents cascading failures",
+        "Concurrency testing is essential for high-traffic services"
+      ],
+      "preventive_measures": [
+        "Mandatory row-level locking for shared resources",
+        "Standardized query ordering across services",
+        "Concurrency testing in CI/CD pipeline",
+        "Database deadlock monitoring and alerting"
+      ]
+    },
+    {
+      "id": "PM-003",
+      "incident_id": "INC-006",
+      "title": "Payments Service Connection Pool Exhaustion (Recurrence) - March 15, 2026",
+      "date": "2026-03-17",
+      "author": "Sarah Chen",
+      "severity": "P1",
+      "summary": "The payments service experienced connection pool exhaustion for the second time, despite the fix from INC-001. The previous fix (increasing pool size to 50) was insufficient for the new traffic pattern caused by a partner integration that increased load by 3x. This incident affected 5,600 users and caused $98,000 in lost revenue.",
+      "root_cause_analysis": {
+        "direct_cause": "Connection pool size increase from INC-001 (to 50) was insufficient for the new traffic pattern caused by partner integration",
+        "contributing_factors": [
+          "Partner integration increased traffic by 3x",
+          "No capacity review before partner integration launch",
+          "Connection pool monitoring alerts were not tuned for new traffic patterns",
+          "No circuit breaker to prevent cascading failures to order-service"
+        ],
+        "why_it_happened": "The fix from INC-001 addressed the immediate issue but didn't account for future traffic growth. When the partner integration launched, traffic increased by 3x, overwhelming the connection pool again. The capacity review process established after INC-001 was not followed before the partner integration launch."
+      },
+      "impact_assessment": {
+        "duration_minutes": 60,
+        "users_affected": 5600,
+        "revenue_impact_usd": 98000,
+        "failed_transactions": 2100,
+        "customer_complaints": 445,
+        "data_loss": false
+      },
+      "resolution": {
+        "immediate_action": "Increased connection pool to 100, implemented connection pool monitoring, added circuit breaker for payment endpoints, deployed read replicas for query offloading",
+        "long_term_fix": "Implemented dynamic connection pool sizing based on traffic patterns, established mandatory capacity reviews for all integrations, added circuit breakers to all tier-1 services"
+      },
+      "action_items": [
+        {
+          "id": "AI-003-1",
+          "description": "Increase connection pool size to 100",
+          "owner": "David Park",
+          "status": "completed",
+          "completed_date": "2026-03-15"
+        },
+        {
+          "id": "AI-003-2",
+          "description": "Add circuit breaker for payment endpoints",
+          "owner": "James Wilson",
+          "status": "completed",
+          "completed_date": "2026-03-15"
+        },
+        {
+          "id": "AI-003-3",
+          "description": "Deploy read replicas for query offloading",
+          "owner": "Lisa Wang",
+          "status": "completed",
+          "completed_date": "2026-03-18"
+        },
+        {
+          "id": "AI-003-4",
+          "description": "Implement dynamic connection pool sizing",
+          "owner": "Mike Rodriguez",
+          "status": "completed",
+          "completed_date": "2026-03-25"
+        },
+        {
+          "id": "AI-003-5",
+          "description": "Establish mandatory capacity review for integrations",
+          "owner": "David Park",
+          "status": "completed",
+          "completed_date": "2026-03-28"
+        },
+        {
+          "id": "AI-003-6",
+          "description": "Add circuit breakers to all tier-1 services",
+          "owner": "Sarah Chen",
+          "status": "in_progress",
+          "target_date": "2026-04-15"
+        }
+      ],
+      "lessons_learned": [
+        "Capacity fixes must account for future growth, not just current needs",
+        "Partner integrations require mandatory capacity reviews",
+        "Circuit breakers prevent cascading failures between services",
+        "Dynamic resource sizing is more resilient than static configuration",
+        "Post-incident action items must be enforced, not just established"
+      ],
+      "preventive_measures": [
+        "Mandatory capacity review before any integration launch",
+        "Dynamic connection pool sizing based on traffic patterns",
+        "Circuit breakers on all tier-1 service dependencies",
+        "Read replicas for all high-traffic database queries",
+        "Quarterly capacity reviews with traffic growth projections"
+      ],
+      "follow_up_notes": "This is the second occurrence of the same root cause. The fix from INC-001 was insufficient. We need to ensure all action items from postmortems are actually completed and enforced. The capacity review process was established but not followed."
+    },
+    {
+      "id": "PM-004",
+      "incident_id": "INC-009",
+      "title": "Deployment Rollback - Breaking API Change - April 18, 2026",
+      "date": "2026-04-20",
+      "author": "Sarah Chen",
+      "severity": "P1",
+      "summary": "A breaking API change (removal of a deprecated field) was deployed without proper contract testing, causing 50% error rates on user endpoints and mobile app crashes. The incident affected 12,000 users and caused $45,000 in lost revenue.",
+      "root_cause_analysis": {
+        "direct_cause": "Breaking API change deployed without proper contract testing. Mobile app still depended on the removed field.",
+        "contributing_factors": [
+          "No API contract tests in CI/CD pipeline",
+          "Deprecated field marked for removal but mobile app not updated",
+          "No API versioning strategy",
+          "Insufficient pre-deployment testing with mobile app",
+          "No canary deployment or gradual rollout"
+        ],
+        "why_it_happened": "The deprecated field was marked for removal in the API documentation, but the mobile app team was not aware of the timeline. The field was removed in deployment v2.5.0 without checking mobile app dependencies. No contract tests existed to catch this breaking change."
+      },
+      "impact_assessment": {
+        "duration_minutes": 30,
+        "users_affected": 12000,
+        "revenue_impact_usd": 45000,
+        "failed_transactions": 0,
+        "customer_complaints": 890,
+        "data_loss": false
+      },
+      "resolution": {
+        "immediate_action": "Rolled back deployment to v2.4.9, restored API compatibility",
+        "long_term_fix": "Added API contract tests to CI/CD pipeline, implemented API versioning strategy, established deprecation process with 90-day notice"
+      },
+      "action_items": [
+        {
+          "id": "AI-004-1",
+          "description": "Add API contract tests to CI/CD pipeline",
+          "owner": "Mike Rodriguez",
+          "status": "completed",
+          "completed_date": "2026-04-18"
+        },
+        {
+          "id": "AI-004-2",
+          "description": "Implement API versioning strategy",
+          "owner": "Sarah Chen",
+          "status": "completed",
+          "completed_date": "2026-04-25"
+        },
+        {
+          "id": "AI-004-3",
+          "description": "Establish deprecation process with 90-day notice",
+          "owner": "David Park",
+          "status": "completed",
+          "completed_date": "2026-04-28"
+        },
+        {
+          "id": "AI-004-4",
+          "description": "Add mobile app integration tests to CI/CD",
+          "owner": "Emma Thompson",
+          "status": "completed",
+          "completed_date": "2026-05-05"
+        },
+        {
+          "id": "AI-004-5",
+          "description": "Implement canary deployment strategy",
+          "owner": "Alex Kim",
+          "status": "in_progress",
+          "target_date": "2026-05-15"
+        }
+      ],
+      "lessons_learned": [
+        "Breaking API changes require comprehensive contract testing",
+        "Deprecation process must include all dependent teams",
+        "Mobile app dependencies must be tracked and tested",
+        "Canary deployments prevent widespread impact from breaking changes",
+        "API versioning is essential for backward compatibility"
+      ],
+      "preventive_measures": [
+        "Mandatory API contract tests in CI/CD pipeline",
+        "90-day deprecation notice for all breaking changes",
+        "API versioning with backward compatibility guarantees",
+        "Mobile app integration tests before deployment",
+        "Canary deployment for all production releases"
+      ]
+    },
+    {
+      "id": "PM-005",
+      "incident_id": "INC-012",
+      "title": "Kubernetes Pod OOM Kills During Traffic Spike - June 1, 2026",
+      "date": "2026-06-03",
+      "author": "Sarah Chen",
+      "severity": "P1",
+      "summary": "During a marketing campaign traffic spike, multiple pods experienced OOM kills due to insufficient memory limits. HPA was not configured for memory-based scaling, only CPU. The incident affected 15,000 users and caused $89,000 in lost revenue.",
+      "root_cause_analysis": {
+        "direct_cause": "Memory limits set too low for traffic spike during marketing campaign. HPA not configured for memory-based scaling.",
+        "contributing_factors": [
+          "Memory limits set during initial deployment and never reviewed",
+          "HPA configured only for CPU, not memory",
+          "No memory usage monitoring or alerts",
+          "Marketing campaign traffic not accounted for in capacity planning",
+          "No load testing with marketing campaign traffic patterns"
+        ],
+        "why_it_happened": "Memory limits were set conservatively during initial deployment. As the application grew and marketing campaigns drove traffic spikes, memory usage increased beyond limits. HPA was only configured for CPU scaling, so pods couldn't scale based on memory pressure."
+      },
+      "impact_assessment": {
+        "duration_minutes": 60,
+        "users_affected": 15000,
+        "revenue_impact_usd": 89000,
+        "failed_transactions": 3400,
+        "customer_complaints": 1200,
+        "data_loss": false
+      },
+      "resolution": {
+        "immediate_action": "Increased memory limits by 50%, configured HPA for memory-based scaling, added memory usage monitoring and alerts",
+        "long_term_fix": "Implemented comprehensive resource monitoring, established capacity review process for marketing campaigns, added memory profiling to CI/CD"
+      },
+      "action_items": [
+        {
+          "id": "AI-005-1",
+          "description": "Increase memory limits by 50%",
+          "owner": "Mike Rodriguez",
+          "status": "completed",
+          "completed_date": "2026-06-01"
+        },
+        {
+          "id": "AI-005-2",
+          "description": "Configure HPA for memory-based scaling",
+          "owner": "Alex Kim",
+          "status": "completed",
+          "completed_date": "2026-06-01"
+        },
+        {
+          "id": "AI-005-3",
+          "description": "Add memory usage monitoring and alerts",
+          "owner": "Mike Rodriguez",
+          "status": "completed",
+          "completed_date": "2026-06-05"
+        },
+        {
+          "id": "AI-005-4",
+          "description": "Establish capacity review for marketing campaigns",
+          "owner": "Emma Thompson",
+          "status": "completed",
+          "completed_date": "2026-06-10"
+        },
+        {
+          "id": "AI-005-5",
+          "description": "Add memory profiling to CI/CD pipeline",
+          "owner": "Lisa Wang",
+          "status": "in_progress",
+          "target_date": "2026-06-20"
+        }
+      ],
+      "lessons_learned": [
+        "Resource limits must be reviewed as application and traffic patterns evolve",
+        "HPA should scale on both CPU and memory for comprehensive protection",
+        "Marketing campaigns require mandatory capacity reviews",
+        "Memory monitoring and alerting prevent OOM kills",
+        "Load testing should include all traffic spike scenarios"
+      ],
+      "preventive_measures": [
+        "Quarterly resource limit reviews for all services",
+        "HPA configured for both CPU and memory scaling",
+        "Mandatory capacity review before marketing campaigns",
+        "Memory usage alerts at 70% and 85% thresholds",
+        "Load testing with marketing campaign traffic patterns"
+      ]
+    },
+    {
+      "id": "PM-006",
+      "incident_id": "INC-015",
+      "title": "Cascading Failure from Search Service Memory Leak - June 28, 2026",
+      "date": "2026-06-30",
+      "author": "Sarah Chen",
+      "severity": "P1",
+      "summary": "A memory leak in the search service caused gradual degradation over 3.5 hours. Dependent services (product-service, order-service) waited for search responses, causing cascading timeouts across the platform. The incident affected 25,000 users and caused $156,000 in lost revenue, making it the most severe incident in company history.",
+      "root_cause_analysis": {
+        "direct_cause": "Memory leak in search service caused gradual degradation. Dependent services waited for search responses, causing cascading timeouts.",
+        "contributing_factors": [
+          "No circuit breakers on dependent services",
+          "No timeout budgets implemented",
+          "Memory leak not detected by monitoring",
+          "No graceful degradation when search is unavailable",
+          "Search service memory limits too high, delaying OOM kill",
+          "No canary deployment to catch memory leaks early"
+        ],
+        "why_it_happened": "A recent deployment introduced a memory leak in the search service. Memory usage gradually increased over 3.5 hours, causing slower query responses. Dependent services (product-service, order-service) had no timeout budgets or circuit breakers, so they waited indefinitely for search responses. This caused cascading timeouts across the platform."
+      },
+      "impact_assessment": {
+        "duration_minutes": 210,
+        "users_affected": 25000,
+        "revenue_impact_usd": 156000,
+        "failed_transactions": 8900,
+        "customer_complaints": 2300,
+        "data_loss": false
+      },
+      "resolution": {
+        "immediate_action": "Fixed memory leak in search service, added circuit breakers to all dependent services, implemented timeout budgets, deployed search service with increased memory limits",
+        "long_term_fix": "Implemented comprehensive circuit breaker strategy across all services, established timeout budget standards, added memory leak detection to CI/CD, deployed chaos engineering tests"
+      },
+      "action_items": [
+        {
+          "id": "AI-006-1",
+          "description": "Fix memory leak in search service",
+          "owner": "Chris Lee",
+          "status": "completed",
+          "completed_date": "2026-06-28"
+        },
+        {
+          "id": "AI-006-2",
+          "description": "Add circuit breakers to all dependent services",
+          "owner": "Sarah Chen",
+          "status": "in_progress",
+          "target_date": "2026-07-15"
+        },
+        {
+          "id": "AI-006-3",
+          "description": "Implement timeout budgets across all services",
+          "owner": "David Park",
+          "status": "in_progress",
+          "target_date": "2026-07-20"
+        },
+        {
+          "id": "AI-006-4",
+          "description": "Add memory leak detection to CI/CD pipeline",
+          "owner": "Mike Rodriguez",
+          "status": "pending",
+          "target_date": "2026-07-25"
+        },
+        {
+          "id": "AI-006-5",
+          "description": "Implement graceful degradation when search is unavailable",
+          "owner": "Lisa Wang",
+          "status": "pending",
+          "target_date": "2026-07-30"
+        },
+        {
+          "id": "AI-006-6",
+          "description": "Deploy chaos engineering tests for cascading failures",
+          "owner": "Alex Kim",
+          "status": "pending",
+          "target_date": "2026-08-15"
+        }
+      ],
+      "lessons_learned": [
+        "Circuit breakers are essential to prevent cascading failures",
+        "Timeout budgets prevent indefinite waits on dependent services",
+        "Memory leak detection must be part of CI/CD pipeline",
+        "Graceful degradation is critical for service resilience",
+        "Cascading failures have exponential impact on users and revenue",
+        "Memory limits should be tuned to trigger OOM before causing cascading issues"
+      ],
+      "preventive_measures": [
+        "Mandatory circuit breakers on all service dependencies",
+        "Timeout budgets enforced across all service calls",
+        "Memory leak detection in CI/CD pipeline",
+        "Graceful degradation strategies for all critical paths",
+        "Chaos engineering tests for cascading failure scenarios",
+        "Quarterly resilience reviews for all tier-1 services"
+      ],
+      "follow_up_notes": "This is the most severe incident in company history. The cascading nature of the failure amplified the impact significantly. We need to prioritize circuit breakers and timeout budgets across all services. Several action items from previous postmortems (like circuit breakers from PM-003) were not completed - we need better tracking and enforcement of postmortem action items."
+    }
+  ]
+}

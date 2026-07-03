@@ -1,0 +1,514 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "generated_at": "2026-07-02T00:00:00Z",
+    "description": "Synthetic DevOps incident reports for Forge demo",
+    "organization": "Acme Corp",
+    "period": "2026-01-01 to 2026-06-30"
+  },
+  "incidents": [
+    {
+      "id": "INC-001",
+      "title": "Payments Service Connection Pool Exhaustion",
+      "timestamp": "2026-01-08T02:14:00Z",
+      "severity": "P1",
+      "status": "resolved",
+      "affected_services": ["payments-service", "order-service"],
+      "symptoms": [
+        "HTTP 500 errors on checkout endpoint",
+        "Payment processing latency spike to 15s",
+        "Database connection timeout errors in logs"
+      ],
+      "root_cause": "PostgreSQL connection pool size (max_connections=20) insufficient for traffic volume during flash sale event",
+      "resolution": "Increased connection pool size to 50, added connection timeout of 30s, implemented connection health checks",
+      "timeline": [
+        {"timestamp": "2026-01-08T02:14:00Z", "event": "CPU usage on payments-service spikes to 95%"},
+        {"timestamp": "2026-01-08T02:15:00Z", "event": "Alert triggered: payments-service high CPU"},
+        {"timestamp": "2026-01-08T02:17:00Z", "event": "HTTP 500 errors begin on /api/v1/checkout"},
+        {"timestamp": "2026-01-08T02:20:00Z", "event": "On-call engineer paged"},
+        {"timestamp": "2026-01-08T02:23:00Z", "event": "Auto-scaling triggered but insufficient"},
+        {"timestamp": "2026-01-08T02:45:00Z", "event": "Identified connection pool exhaustion in logs"},
+        {"timestamp": "2026-01-08T03:01:00Z", "event": "Restarted payments-service pods with increased pool size"},
+        {"timestamp": "2026-01-08T03:15:00Z", "event": "Metrics normalized, incident resolved"}
+      ],
+      "duration_minutes": 61,
+      "impact": {
+        "users_affected": 2340,
+        "revenue_impact_usd": 45000,
+        "failed_transactions": 890
+      },
+      "on_call_engineer": "Sarah Chen",
+      "tags": ["database", "connection-pool", "payments", "scaling"],
+      "postmortem_id": "PM-001"
+    },
+    {
+      "id": "INC-002",
+      "title": "Auth Service Memory Leak",
+      "timestamp": "2026-01-15T14:30:00Z",
+      "severity": "P2",
+      "status": "resolved",
+      "affected_services": ["auth-service"],
+      "symptoms": [
+        "Gradual memory increase over 48 hours",
+        "OOM kills in Kubernetes",
+        "Users experiencing intermittent login failures"
+      ],
+      "root_cause": "Database connections not properly closed in session middleware due to missing try-finally block",
+      "resolution": "Fixed connection cleanup in session middleware, added memory monitoring alerts, implemented connection pool validation",
+      "timeline": [
+        {"timestamp": "2026-01-13T14:30:00Z", "event": "Memory usage starts gradual increase"},
+        {"timestamp": "2026-01-15T10:00:00Z", "event": "Memory usage reaches 85% of limit"},
+        {"timestamp": "2026-01-15T14:30:00Z", "event": "First OOM kill occurs"},
+        {"timestamp": "2026-01-15T14:35:00Z", "event": "Alert: auth-service pod restarted"},
+        {"timestamp": "2026-01-15T15:00:00Z", "event": "On-call investigates memory leak"},
+        {"timestamp": "2026-01-15T16:30:00Z", "event": "Identified unclosed database connections"},
+        {"timestamp": "2026-01-15T17:00:00Z", "event": "Deployed fix with proper connection cleanup"},
+        {"timestamp": "2026-01-15T17:30:00Z", "event": "Memory usage stabilized, incident resolved"}
+      ],
+      "duration_minutes": 180,
+      "impact": {
+        "users_affected": 1200,
+        "revenue_impact_usd": 8000,
+        "failed_transactions": 0
+      },
+      "on_call_engineer": "Mike Rodriguez",
+      "tags": ["memory-leak", "auth", "kubernetes", "database"],
+      "postmortem_id": null
+    },
+    {
+      "id": "INC-003",
+      "title": "Order Service Database Deadlock",
+      "timestamp": "2026-02-03T09:45:00Z",
+      "severity": "P1",
+      "status": "resolved",
+      "affected_services": ["order-service", "inventory-service"],
+      "symptoms": [
+        "Order creation failing with timeout errors",
+        "Database lock contention detected",
+        "Inventory updates delayed"
+      ],
+      "root_cause": "Concurrent updates to same order row from order-service and inventory-service causing deadlock",
+      "resolution": "Implemented row-level locking with SELECT FOR UPDATE, optimized query order, added deadlock detection and retry logic",
+      "timeline": [
+        {"timestamp": "2026-02-03T09:45:00Z", "event": "Order creation latency increases to 30s"},
+        {"timestamp": "2026-02-03T09:50:00Z", "event": "Alert: order-service high latency"},
+        {"timestamp": "2026-02-03T09:55:00Z", "event": "Database deadlock detected in logs"},
+        {"timestamp": "2026-02-03T10:00:00Z", "event": "On-call engineer paged"},
+        {"timestamp": "2026-02-03T10:15:00Z", "event": "Identified concurrent updates causing deadlock"},
+        {"timestamp": "2026-02-03T10:45:00Z", "event": "Implemented row-level locking fix"},
+        {"timestamp": "2026-02-03T11:00:00Z", "event": "Deployed fix to production"},
+        {"timestamp": "2026-02-03T11:15:00Z", "event": "Order creation latency normalized"}
+      ],
+      "duration_minutes": 90,
+      "impact": {
+        "users_affected": 3400,
+        "revenue_impact_usd": 67000,
+        "failed_transactions": 1200
+      },
+      "on_call_engineer": "Sarah Chen",
+      "tags": ["database", "deadlock", "orders", "concurrency"],
+      "postmortem_id": "PM-002"
+    },
+    {
+      "id": "INC-004",
+      "title": "DNS Resolution Failure",
+      "timestamp": "2026-02-12T16:20:00Z",
+      "severity": "P3",
+      "status": "resolved",
+      "affected_services": ["api-gateway", "all-services"],
+      "symptoms": [
+        "Intermittent service discovery failures",
+        "DNS lookup timeouts",
+        "Services unable to resolve internal hostnames"
+      ],
+      "root_cause": "DNS cache poisoning attempt caused DNS resolver to reject legitimate queries",
+      "resolution": "Rotated DNS keys, enabled DNSSEC validation, added DNS query logging and anomaly detection",
+      "timeline": [
+        {"timestamp": "2026-02-12T16:20:00Z", "event": "DNS lookup timeouts begin"},
+        {"timestamp": "2026-02-12T16:25:00Z", "event": "Alert: service discovery failures"},
+        {"timestamp": "2026-02-12T16:30:00Z", "event": "On-call investigates DNS issues"},
+        {"timestamp": "2026-02-12T16:45:00Z", "event": "Identified DNS cache poisoning indicators"},
+        {"timestamp": "2026-02-12T17:00:00Z", "event": "Rotated DNS keys and flushed cache"},
+        {"timestamp": "2026-02-12T17:15:00Z", "event": "DNS resolution restored"},
+        {"timestamp": "2026-02-12T17:30:00Z", "event": "Enabled DNSSEC validation"}
+      ],
+      "duration_minutes": 70,
+      "impact": {
+        "users_affected": 5000,
+        "revenue_impact_usd": 12000,
+        "failed_transactions": 0
+      },
+      "on_call_engineer": "Alex Kim",
+      "tags": ["dns", "security", "network", "service-discovery"],
+      "postmortem_id": null
+    },
+    {
+      "id": "INC-005",
+      "title": "SSL Certificate Expiration",
+      "timestamp": "2026-02-28T08:00:00Z",
+      "severity": "P2",
+      "status": "resolved",
+      "affected_services": ["api-gateway", "web-frontend"],
+      "symptoms": [
+        "HTTPS connection errors",
+        "Browser security warnings",
+        "API clients rejecting connections"
+      ],
+      "root_cause": "SSL certificate auto-renewal cron job failed due to misconfigured API credentials",
+      "resolution": "Manually renewed certificate, fixed auto-renewal cron job, added certificate expiration monitoring with 30-day warning",
+      "timeline": [
+        {"timestamp": "2026-02-28T08:00:00Z", "event": "SSL certificate expires"},
+        {"timestamp": "2026-02-28T08:05:00Z", "event": "Users report HTTPS errors"},
+        {"timestamp": "2026-02-28T08:10:00Z", "event": "Alert: SSL certificate expired"},
+        {"timestamp": "2026-02-28T08:15:00Z", "event": "On-call engineer paged"},
+        {"timestamp": "2026-02-28T08:30:00Z", "event": "Manual certificate renewal initiated"},
+        {"timestamp": "2026-02-28T08:45:00Z", "event": "New certificate deployed"},
+        {"timestamp": "2026-02-28T09:00:00Z", "event": "HTTPS connections restored"},
+        {"timestamp": "2026-02-28T10:00:00Z", "event": "Fixed auto-renewal cron job"}
+      ],
+      "duration_minutes": 60,
+      "impact": {
+        "users_affected": 8000,
+        "revenue_impact_usd": 25000,
+        "failed_transactions": 0
+      },
+      "on_call_engineer": "Mike Rodriguez",
+      "tags": ["ssl", "certificate", "security", "monitoring"],
+      "postmortem_id": null
+    },
+    {
+      "id": "INC-006",
+      "title": "Payments Service Connection Pool Exhaustion (Recurrence)",
+      "timestamp": "2026-03-15T11:30:00Z",
+      "severity": "P1",
+      "status": "resolved",
+      "affected_services": ["payments-service", "order-service", "api-gateway"],
+      "symptoms": [
+        "HTTP 500 errors on all payment endpoints",
+        "Cascading failures to order-service",
+        "API gateway timeout errors"
+      ],
+      "root_cause": "Connection pool size increase from INC-001 was insufficient. Traffic pattern changed with new partner integration causing 3x normal load",
+      "resolution": "Increased connection pool to 100, implemented connection pool monitoring, added circuit breaker for payment endpoints, deployed read replicas for query offloading",
+      "timeline": [
+        {"timestamp": "2026-03-15T11:30:00Z", "event": "Payment processing latency spikes to 20s"},
+        {"timestamp": "2026-03-15T11:32:00Z", "event": "Alert: payments-service connection pool exhausted"},
+        {"timestamp": "2026-03-15T11:35:00Z", "event": "HTTP 500 errors cascade to order-service"},
+        {"timestamp": "2026-03-15T11:40:00Z", "event": "On-call engineer paged"},
+        {"timestamp": "2026-03-15T11:45:00Z", "event": "Identified connection pool exhaustion (similar to INC-001)"},
+        {"timestamp": "2026-03-15T12:00:00Z", "event": "Increased pool size to 100, deployed read replicas"},
+        {"timestamp": "2026-03-15T12:15:00Z", "event": "Added circuit breaker for payment endpoints"},
+        {"timestamp": "2026-03-15T12:30:00Z", "event": "All services stabilized"}
+      ],
+      "duration_minutes": 60,
+      "impact": {
+        "users_affected": 5600,
+        "revenue_impact_usd": 98000,
+        "failed_transactions": 2100
+      },
+      "on_call_engineer": "Sarah Chen",
+      "tags": ["database", "connection-pool", "payments", "scaling", "recurrence"],
+      "postmortem_id": "PM-003"
+    },
+    {
+      "id": "INC-007",
+      "title": "Rate Limiter Misconfiguration",
+      "timestamp": "2026-03-22T13:15:00Z",
+      "severity": "P2",
+      "status": "resolved",
+      "affected_services": ["api-gateway"],
+      "symptoms": [
+        "Legitimate users receiving 429 Too Many Requests",
+        "API rate limit errors in client applications",
+        "Customer complaints about access issues"
+      ],
+      "root_cause": "Rate limit configuration not updated after horizontal scaling. Per-pod limits applied instead of global limits",
+      "resolution": "Implemented distributed rate limiting with Redis, adjusted limits to account for scaling, added per-user quotas",
+      "timeline": [
+        {"timestamp": "2026-03-22T13:15:00Z", "event": "Users report 429 errors"},
+        {"timestamp": "2026-03-22T13:20:00Z", "event": "Alert: rate limit errors increasing"},
+        {"timestamp": "2026-03-22T13:25:00Z", "event": "On-call investigates rate limiter"},
+        {"timestamp": "2026-03-22T13:40:00Z", "event": "Identified per-pod vs global limit issue"},
+        {"timestamp": "2026-03-22T14:00:00Z", "event": "Deployed distributed rate limiter with Redis"},
+        {"timestamp": "2026-03-22T14:15:00Z", "event": "Rate limit errors resolved"}
+      ],
+      "duration_minutes": 60,
+      "impact": {
+        "users_affected": 4200,
+        "revenue_impact_usd": 15000,
+        "failed_transactions": 0
+      },
+      "on_call_engineer": "Alex Kim",
+      "tags": ["rate-limiting", "api-gateway", "scaling", "configuration"],
+      "postmortem_id": null
+    },
+    {
+      "id": "INC-008",
+      "title": "Cache Stampede",
+      "timestamp": "2026-04-05T19:00:00Z",
+      "severity": "P3",
+      "status": "resolved",
+      "affected_services": ["user-service", "product-service"],
+      "symptoms": [
+        "Database CPU usage spike to 100%",
+        "Slow query response times",
+        "Application timeouts"
+      ],
+      "root_cause": "All cache entries expired simultaneously causing thundering herd of database queries",
+      "resolution": "Added jitter to cache TTL (±10%), implemented cache warming strategy, added query result caching at application level",
+      "timeline": [
+        {"timestamp": "2026-04-05T19:00:00Z", "event": "Cache entries expire simultaneously"},
+        {"timestamp": "2026-04-05T19:01:00Z", "event": "Database CPU spikes to 100%"},
+        {"timestamp": "2026-04-05T19:02:00Z", "event": "Alert: database high CPU"},
+        {"timestamp": "2026-04-05T19:05:00Z", "event": "On-call investigates"},
+        {"timestamp": "2026-04-05T19:15:00Z", "event": "Identified cache stampede pattern"},
+        {"timestamp": "2026-04-05T19:30:00Z", "event": "Deployed fix with TTL jitter"},
+        {"timestamp": "2026-04-05T19:45:00Z", "event": "Database CPU normalized"}
+      ],
+      "duration_minutes": 45,
+      "impact": {
+        "users_affected": 6000,
+        "revenue_impact_usd": 18000,
+        "failed_transactions": 0
+      },
+      "on_call_engineer": "Mike Rodriguez",
+      "tags": ["cache", "database", "performance", "thundering-herd"],
+      "postmortem_id": null
+    },
+    {
+      "id": "INC-009",
+      "title": "Deployment Rollback - Breaking API Change",
+      "timestamp": "2026-04-18T10:30:00Z",
+      "severity": "P1",
+      "status": "resolved",
+      "affected_services": ["user-service", "api-gateway", "mobile-app"],
+      "symptoms": [
+        "50% error rate on user endpoints",
+        "Mobile app crashes on launch",
+        "API contract violations detected"
+      ],
+      "root_cause": "Breaking API change (removed deprecated field) deployed without proper contract testing. Mobile app still depended on removed field",
+      "resolution": "Rolled back deployment, added API contract tests to CI/CD pipeline, implemented API versioning strategy",
+      "timeline": [
+        {"timestamp": "2026-04-18T10:30:00Z", "event": "Deployment v2.5.0 released"},
+        {"timestamp": "2026-04-18T10:32:00Z", "event": "Error rate spikes to 50%"},
+        {"timestamp": "2026-04-18T10:35:00Z", "event": "Alert: user-service high error rate"},
+        {"timestamp": "2026-04-18T10:40:00Z", "event": "On-call engineer paged"},
+        {"timestamp": "2026-04-18T10:45:00Z", "event": "Identified breaking API change"},
+        {"timestamp": "2026-04-18T10:50:00Z", "event": "Initiated rollback to v2.4.9"},
+        {"timestamp": "2026-04-18T11:00:00Z", "event": "Rollback complete, error rate normalized"},
+        {"timestamp": "2026-04-18T11:30:00Z", "event": "Added API contract tests to CI/CD"}
+      ],
+      "duration_minutes": 30,
+      "impact": {
+        "users_affected": 12000,
+        "revenue_impact_usd": 45000,
+        "failed_transactions": 0
+      },
+      "on_call_engineer": "Sarah Chen",
+      "tags": ["deployment", "api", "breaking-change", "rollback", "testing"],
+      "postmortem_id": "PM-004"
+    },
+    {
+      "id": "INC-010",
+      "title": "Third-Party Payment API Timeout",
+      "timestamp": "2026-05-02T15:45:00Z",
+      "severity": "P2",
+      "status": "resolved",
+      "affected_services": ["payments-service"],
+      "symptoms": [
+        "Payment processing delays (30s+ timeout)",
+        "Stripe API returning 504 Gateway Timeout",
+        "Customers unable to complete purchases"
+      ],
+      "root_cause": "Stripe API experiencing degradation due to their infrastructure issue",
+      "resolution": "Implemented circuit breaker pattern, added fallback payment processor (PayPal), configured automatic failover after 3 consecutive timeouts",
+      "timeline": [
+        {"timestamp": "2026-05-02T15:45:00Z", "event": "Payment processing delays begin"},
+        {"timestamp": "2026-05-02T15:50:00Z", "event": "Alert: payments-service timeout errors"},
+        {"timestamp": "2026-05-02T15:55:00Z", "event": "On-call investigates"},
+        {"timestamp": "2026-05-02T16:00:00Z", "event": "Confirmed Stripe API degradation"},
+        {"timestamp": "2026-05-02T16:10:00Z", "event": "Activated circuit breaker"},
+        {"timestamp": "2026-05-02T16:15:00Z", "event": "Switched to PayPal fallback"},
+        {"timestamp": "2026-05-02T16:30:00Z", "event": "Payment processing restored via fallback"}
+      ],
+      "duration_minutes": 45,
+      "impact": {
+        "users_affected": 3800,
+        "revenue_impact_usd": 72000,
+        "failed_transactions": 890
+      },
+      "on_call_engineer": "Alex Kim",
+      "tags": ["third-party", "stripe", "timeout", "circuit-breaker", "fallback"],
+      "postmortem_id": null
+    },
+    {
+      "id": "INC-011",
+      "title": "Disk Space Exhaustion on Log Server",
+      "timestamp": "2026-05-15T22:00:00Z",
+      "severity": "P3",
+      "status": "resolved",
+      "affected_services": ["logging-service"],
+      "symptoms": [
+        "Logs not being written to disk",
+        "Service crashes due to unable to write logs",
+        "Monitoring alerts not firing"
+      ],
+      "root_cause": "Log rotation misconfigured - logs not being rotated, disk filled up over 2 weeks",
+      "resolution": "Fixed log rotation configuration (logrotate), added disk space monitoring with 80% threshold alert, implemented log archival to S3",
+      "timeline": [
+        {"timestamp": "2026-05-15T22:00:00Z", "event": "Disk space reaches 100%"},
+        {"timestamp": "2026-05-15T22:05:00Z", "event": "Services unable to write logs"},
+        {"timestamp": "2026-05-15T22:10:00Z", "event": "Alert: disk space critical"},
+        {"timestamp": "2026-05-15T22:15:00Z", "event": "On-call investigates"},
+        {"timestamp": "2026-05-15T22:30:00Z", "event": "Identified log rotation issue"},
+        {"timestamp": "2026-05-15T22:45:00Z", "event": "Manually rotated logs, freed space"},
+        {"timestamp": "2026-05-15T23:00:00Z", "event": "Fixed logrotate configuration"}
+      ],
+      "duration_minutes": 60,
+      "impact": {
+        "users_affected": 0,
+        "revenue_impact_usd": 0,
+        "failed_transactions": 0
+      },
+      "on_call_engineer": "Mike Rodriguez",
+      "tags": ["disk-space", "logging", "monitoring", "configuration"],
+      "postmortem_id": null
+    },
+    {
+      "id": "INC-012",
+      "title": "Kubernetes Pod OOM Kills During Traffic Spike",
+      "timestamp": "2026-06-01T14:00:00Z",
+      "severity": "P1",
+      "status": "resolved",
+      "affected_services": ["api-gateway", "user-service", "product-service"],
+      "symptoms": [
+        "Pods continuously restarting",
+        "Service unavailable errors",
+        "Kubernetes OOM kill events in logs"
+      ],
+      "root_cause": "Memory limits set too low for traffic spike during marketing campaign. HPA not configured for memory-based scaling",
+      "resolution": "Increased memory limits by 50%, configured HPA for memory-based scaling, added memory usage monitoring and alerts",
+      "timeline": [
+        {"timestamp": "2026-06-01T14:00:00Z", "event": "Traffic spike from marketing campaign"},
+        {"timestamp": "2026-06-01T14:05:00Z", "event": "Pods start hitting memory limits"},
+        {"timestamp": "2026-06-01T14:10:00Z", "event": "First OOM kill occurs"},
+        {"timestamp": "2026-06-01T14:15:00Z", "event": "Alert: pods restarting"},
+        {"timestamp": "2026-06-01T14:20:00Z", "event": "On-call engineer paged"},
+        {"timestamp": "2026-06-01T14:30:00Z", "event": "Increased memory limits"},
+        {"timestamp": "2026-06-01T14:45:00Z", "event": "Configured HPA for memory scaling"},
+        {"timestamp": "2026-06-01T15:00:00Z", "event": "Pods stabilized, incident resolved"}
+      ],
+      "duration_minutes": 60,
+      "impact": {
+        "users_affected": 15000,
+        "revenue_impact_usd": 89000,
+        "failed_transactions": 3400
+      },
+      "on_call_engineer": "Sarah Chen",
+      "tags": ["kubernetes", "memory", "scaling", "oom", "traffic-spike"],
+      "postmortem_id": "PM-005"
+    },
+    {
+      "id": "INC-013",
+      "title": "Message Queue Backlog",
+      "timestamp": "2026-06-12T08:30:00Z",
+      "severity": "P2",
+      "status": "resolved",
+      "affected_services": ["notification-service", "order-service"],
+      "symptoms": [
+        "Email notifications delayed by 2+ hours",
+        "Order processing queue backing up",
+        "RabbitMQ queue depth increasing"
+      ],
+      "root_cause": "Notification service consumer not keeping up with producer due to slow email API responses",
+      "resolution": "Added more consumer instances, optimized email template rendering, implemented async email sending with retry logic",
+      "timeline": [
+        {"timestamp": "2026-06-12T08:30:00Z", "event": "Queue depth starts increasing"},
+        {"timestamp": "2026-06-12T09:00:00Z", "event": "Alert: notification queue depth > 10000"},
+        {"timestamp": "2026-06-12T09:05:00Z", "event": "On-call investigates"},
+        {"timestamp": "2026-06-12T09:15:00Z", "event": "Identified slow email API responses"},
+        {"timestamp": "2026-06-12T09:30:00Z", "event": "Added more consumer instances"},
+        {"timestamp": "2026-06-12T09:45:00Z", "event": "Queue depth starts decreasing"},
+        {"timestamp": "2026-06-12T10:30:00Z", "event": "Queue backlog cleared"}
+      ],
+      "duration_minutes": 120,
+      "impact": {
+        "users_affected": 8000,
+        "revenue_impact_usd": 5000,
+        "failed_transactions": 0
+      },
+      "on_call_engineer": "Alex Kim",
+      "tags": ["message-queue", "rabbitmq", "notifications", "performance"],
+      "postmortem_id": null
+    },
+    {
+      "id": "INC-014",
+      "title": "Configuration Drift Between Environments",
+      "timestamp": "2026-06-20T11:00:00Z",
+      "severity": "P4",
+      "status": "resolved",
+      "affected_services": ["order-service"],
+      "symptoms": [
+        "Different behavior in staging vs production",
+        "Tests passing in CI but failing in production",
+        "Feature flags not working as expected"
+      ],
+      "root_cause": "Manual configuration change in production not propagated to staging or Git repository",
+      "resolution": "Implemented GitOps workflow with ArgoCD, added configuration validation in CI/CD, automated config sync across environments",
+      "timeline": [
+        {"timestamp": "2026-06-20T11:00:00Z", "event": "Developer notices config difference"},
+        {"timestamp": "2026-06-20T11:15:00Z", "event": "Investigation reveals manual prod change"},
+        {"timestamp": "2026-06-20T11:30:00Z", "event": "On-call reviews configuration drift"},
+        {"timestamp": "2026-06-20T12:00:00Z", "event": "Implemented GitOps with ArgoCD"},
+        {"timestamp": "2026-06-20T13:00:00Z", "event": "Configuration synchronized across environments"}
+      ],
+      "duration_minutes": 120,
+      "impact": {
+        "users_affected": 0,
+        "revenue_impact_usd": 0,
+        "failed_transactions": 0
+      },
+      "on_call_engineer": "Mike Rodriguez",
+      "tags": ["configuration", "gitops", "environments", "drift"],
+      "postmortem_id": null
+    },
+    {
+      "id": "INC-015",
+      "title": "Cascading Failure from Search Service Memory Leak",
+      "timestamp": "2026-06-28T16:00:00Z",
+      "severity": "P1",
+      "status": "resolved",
+      "affected_services": ["search-service", "api-gateway", "product-service", "order-service"],
+      "symptoms": [
+        "Search queries timing out",
+        "API gateway returning 504 errors",
+        "Multiple services experiencing timeouts",
+        "Cascading failure across dependent services"
+      ],
+      "root_cause": "Search service memory leak caused gradual degradation. Dependent services (product-service, order-service) waited for search responses, causing cascading timeouts",
+      "resolution": "Fixed memory leak in search service, added circuit breakers to all dependent services, implemented timeout budgets, deployed search service with increased memory limits",
+      "timeline": [
+        {"timestamp": "2026-06-28T16:00:00Z", "event": "Search service memory usage starts increasing"},
+        {"timestamp": "2026-06-28T17:00:00Z", "event": "Search query latency increases to 10s"},
+        {"timestamp": "2026-06-28T18:00:00Z", "event": "Product-service starts timing out waiting for search"},
+        {"timestamp": "2026-06-28T18:30:00Z", "event": "Alert: search-service high latency"},
+        {"timestamp": "2026-06-28T18:35:00Z", "event": "Cascading failures begin"},
+        {"timestamp": "2026-06-28T18:40:00Z", "event": "On-call engineer paged"},
+        {"timestamp": "2026-06-28T18:50:00Z", "event": "Identified search service memory leak"},
+        {"timestamp": "2026-06-28T19:00:00Z", "event": "Restarted search service with memory fix"},
+        {"timestamp": "2026-06-28T19:15:00Z", "event": "Added circuit breakers to dependent services"},
+        {"timestamp": "2026-06-28T19:30:00Z", "event": "All services stabilized"}
+      ],
+      "duration_minutes": 210,
+      "impact": {
+        "users_affected": 25000,
+        "revenue_impact_usd": 156000,
+        "failed_transactions": 8900
+      },
+      "on_call_engineer": "Sarah Chen",
+      "tags": ["memory-leak", "cascading-failure", "search", "circuit-breaker", "timeout"],
+      "postmortem_id": "PM-006"
+    }
+  ]
+}

@@ -1,0 +1,367 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "generated_at": "2026-07-02T00:00:00Z",
+    "description": "Acme Corp microservices architecture and team ownership",
+    "organization": "Acme Corp",
+    "last_updated": "2026-06-30"
+  },
+  "services": [
+    {
+      "name": "api-gateway",
+      "description": "Main entry point for all client requests. Handles routing, authentication, rate limiting, and request transformation.",
+      "team": "platform-team",
+      "language": "Go",
+      "framework": "Gin",
+      "database": null,
+      "cache": "redis",
+      "dependencies": ["auth-service", "user-service", "order-service", "payments-service", "product-service", "search-service"],
+      "health_check": "/health",
+      "port": 8080,
+      "replicas": 5,
+      "cpu_limit": "500m",
+      "memory_limit": "512Mi",
+      "runbook": "RUNBOOK-API-GATEWAY",
+      "criticality": "tier-1",
+      "sla": "99.99%"
+    },
+    {
+      "name": "auth-service",
+      "description": "Handles user authentication, JWT token generation, OAuth2 flows, and session management.",
+      "team": "platform-team",
+      "language": "Python",
+      "framework": "FastAPI",
+      "database": "postgresql",
+      "cache": "redis",
+      "dependencies": ["user-service"],
+      "health_check": "/health",
+      "port": 8081,
+      "replicas": 3,
+      "cpu_limit": "300m",
+      "memory_limit": "256Mi",
+      "runbook": "RUNBOOK-AUTH",
+      "criticality": "tier-1",
+      "sla": "99.99%"
+    },
+    {
+      "name": "user-service",
+      "description": "Manages user profiles, preferences, and account data. Provides user CRUD operations.",
+      "team": "growth-team",
+      "language": "Python",
+      "framework": "FastAPI",
+      "database": "postgresql",
+      "cache": "redis",
+      "dependencies": [],
+      "health_check": "/health",
+      "port": 8082,
+      "replicas": 3,
+      "cpu_limit": "300m",
+      "memory_limit": "256Mi",
+      "runbook": "RUNBOOK-USER",
+      "criticality": "tier-1",
+      "sla": "99.99%"
+    },
+    {
+      "name": "payments-service",
+      "description": "Processes payments via Stripe and PayPal. Handles payment intents, refunds, and transaction history.",
+      "team": "commerce-team",
+      "language": "Python",
+      "framework": "FastAPI",
+      "database": "postgresql",
+      "cache": "redis",
+      "dependencies": ["order-service"],
+      "external_apis": ["stripe", "paypal"],
+      "health_check": "/health",
+      "port": 8083,
+      "replicas": 4,
+      "cpu_limit": "500m",
+      "memory_limit": "512Mi",
+      "runbook": "RUNBOOK-PAYMENTS",
+      "criticality": "tier-1",
+      "sla": "99.99%"
+    },
+    {
+      "name": "order-service",
+      "description": "Manages order lifecycle: creation, updates, fulfillment, and cancellation. Orchestrates payments and inventory.",
+      "team": "commerce-team",
+      "language": "Python",
+      "framework": "FastAPI",
+      "database": "postgresql",
+      "cache": "redis",
+      "dependencies": ["inventory-service", "payments-service", "notification-service"],
+      "health_check": "/health",
+      "port": 8084,
+      "replicas": 4,
+      "cpu_limit": "500m",
+      "memory_limit": "512Mi",
+      "runbook": "RUNBOOK-ORDER",
+      "criticality": "tier-1",
+      "sla": "99.99%"
+    },
+    {
+      "name": "inventory-service",
+      "description": "Tracks product inventory levels, handles stock reservations, and manages warehouse data.",
+      "team": "commerce-team",
+      "language": "Python",
+      "framework": "FastAPI",
+      "database": "postgresql",
+      "cache": "redis",
+      "dependencies": [],
+      "health_check": "/health",
+      "port": 8085,
+      "replicas": 3,
+      "cpu_limit": "300m",
+      "memory_limit": "256Mi",
+      "runbook": "RUNBOOK-INVENTORY",
+      "criticality": "tier-2",
+      "sla": "99.95%"
+    },
+    {
+      "name": "product-service",
+      "description": "Manages product catalog, categories, pricing, and product search indexing.",
+      "team": "commerce-team",
+      "language": "Python",
+      "framework": "FastAPI",
+      "database": "postgresql",
+      "cache": "redis",
+      "dependencies": ["search-service", "inventory-service"],
+      "health_check": "/health",
+      "port": 8086,
+      "replicas": 3,
+      "cpu_limit": "300m",
+      "memory_limit": "256Mi",
+      "runbook": "RUNBOOK-PRODUCT",
+      "criticality": "tier-1",
+      "sla": "99.99%"
+    },
+    {
+      "name": "search-service",
+      "description": "Provides full-text search across products, orders, and users. Powered by Elasticsearch.",
+      "team": "data-team",
+      "language": "Python",
+      "framework": "FastAPI",
+      "database": "elasticsearch",
+      "cache": "redis",
+      "dependencies": [],
+      "health_check": "/health",
+      "port": 8087,
+      "replicas": 3,
+      "cpu_limit": "1000m",
+      "memory_limit": "2Gi",
+      "runbook": "RUNBOOK-SEARCH",
+      "criticality": "tier-2",
+      "sla": "99.95%"
+    },
+    {
+      "name": "notification-service",
+      "description": "Handles email, SMS, and push notifications. Processes notification queue and manages templates.",
+      "team": "growth-team",
+      "language": "Python",
+      "framework": "FastAPI",
+      "database": "postgresql",
+      "cache": "redis",
+      "dependencies": [],
+      "external_apis": ["sendgrid", "twilio", "firebase"],
+      "message_queue": "rabbitmq",
+      "health_check": "/health",
+      "port": 8088,
+      "replicas": 2,
+      "cpu_limit": "300m",
+      "memory_limit": "256Mi",
+      "runbook": "RUNBOOK-NOTIFICATION",
+      "criticality": "tier-2",
+      "sla": "99.9%"
+    },
+    {
+      "name": "analytics-service",
+      "description": "Collects and processes business metrics, user behavior data, and generates reports.",
+      "team": "data-team",
+      "language": "Python",
+      "framework": "FastAPI",
+      "database": "postgresql",
+      "cache": "redis",
+      "dependencies": ["elasticsearch"],
+      "health_check": "/health",
+      "port": 8089,
+      "replicas": 2,
+      "cpu_limit": "500m",
+      "memory_limit": "512Mi",
+      "runbook": "RUNBOOK-ANALYTICS",
+      "criticality": "tier-3",
+      "sla": "99.9%"
+    }
+  ],
+  "teams": [
+    {
+      "name": "platform-team",
+      "display_name": "Platform Team",
+      "description": "Responsible for core infrastructure, authentication, and API gateway.",
+      "lead": "Sarah Chen",
+      "members": ["Sarah Chen", "Mike Rodriguez", "Alex Kim"],
+      "services": ["api-gateway", "auth-service"],
+      "on_call_rotation": "platform-oncall",
+      "slack_channel": "#platform-team",
+      "pagerduty_service": "platform-critical"
+    },
+    {
+      "name": "commerce-team",
+      "display_name": "Commerce Team",
+      "description": "Handles all commerce-related services: payments, orders, inventory, and products.",
+      "lead": "David Park",
+      "members": ["David Park", "Lisa Wang", "James Wilson"],
+      "services": ["payments-service", "order-service", "inventory-service", "product-service"],
+      "on_call_rotation": "commerce-oncall",
+      "slack_channel": "#commerce-team",
+      "pagerduty_service": "commerce-critical"
+    },
+    {
+      "name": "growth-team",
+      "display_name": "Growth Team",
+      "description": "Focuses on user acquisition, retention, notifications, and user experience.",
+      "lead": "Emma Thompson",
+      "members": ["Emma Thompson", "Ryan Garcia"],
+      "services": ["user-service", "notification-service"],
+      "on_call_rotation": "growth-oncall",
+      "slack_channel": "#growth-team",
+      "pagerduty_service": "growth-standard"
+    },
+    {
+      "name": "data-team",
+      "display_name": "Data Team",
+      "description": "Manages search, analytics, data pipelines, and reporting infrastructure.",
+      "lead": "Chris Lee",
+      "members": ["Chris Lee", "Nina Patel"],
+      "services": ["search-service", "analytics-service"],
+      "on_call_rotation": "data-oncall",
+      "slack_channel": "#data-team",
+      "pagerduty_service": "data-standard"
+    }
+  ],
+  "runbooks": [
+    {
+      "id": "RUNBOOK-API-GATEWAY",
+      "service": "api-gateway",
+      "title": "API Gateway Runbook",
+      "sections": [
+        {
+          "title": "Common Issues",
+          "content": "1. High latency: Check upstream service health, review rate limiting config\n2. 502/503 errors: Verify backend services are running, check network connectivity\n3. Rate limit errors: Review rate limit configuration in Redis"
+        },
+        {
+          "title": "Restart Procedure",
+          "content": "kubectl rollout restart deployment/api-gateway -n production\nMonitor with: kubectl get pods -n production -l app=api-gateway -w"
+        },
+        {
+          "title": "Escalation",
+          "content": "Contact Platform Team on-call: #platform-team Slack channel\nPagerDuty: platform-critical service"
+        }
+      ]
+    },
+    {
+      "id": "RUNBOOK-PAYMENTS",
+      "service": "payments-service",
+      "title": "Payments Service Runbook",
+      "sections": [
+        {
+          "title": "Connection Pool Issues",
+          "content": "1. Check current pool size: SELECT count(*) FROM pg_stat_activity WHERE datname = 'payments_db'\n2. Increase pool size in config: DB_POOL_SIZE=100\n3. Restart service: kubectl rollout restart deployment/payments-service"
+        },
+        {
+          "title": "Stripe API Failures",
+          "content": "1. Check Stripe status: https://status.stripe.com\n2. If Stripe is down, circuit breaker should auto-activate\n3. Manual fallback: Set PAYMENT_PROVIDER=paypal in config\n4. Monitor: Grafana dashboard 'Payments - Provider Health'"
+        },
+        {
+          "title": "Transaction Failures",
+          "content": "1. Check payment logs: kubectl logs -l app=payments-service | grep ERROR\n2. Verify database connectivity\n3. Check Stripe webhook delivery status\n4. Review failed transactions in payments table"
+        },
+        {
+          "title": "Escalation",
+          "content": "Contact Commerce Team on-call: #commerce-team Slack channel\nPagerDuty: commerce-critical service\nFor Stripe issues: Contact Stripe support via dashboard"
+        }
+      ]
+    },
+    {
+      "id": "RUNBOOK-SEARCH",
+      "service": "search-service",
+      "title": "Search Service Runbook",
+      "sections": [
+        {
+          "title": "Memory Issues",
+          "content": "1. Check memory usage: kubectl top pod -l app=search-service\n2. If >80%, increase memory limit in deployment\n3. Check for memory leaks: Review recent deployments\n4. Restart if necessary: kubectl rollout restart deployment/search-service"
+        },
+        {
+          "title": "Elasticsearch Issues",
+          "content": "1. Check ES cluster health: curl -s http://elasticsearch:9200/_cluster/health\n2. Check index status: curl -s http://elasticsearch:9200/_cat/indices\n3. If red status, check shard allocation\n4. Rebuild index if corrupted: POST /_reindex"
+        },
+        {
+          "title": "Slow Queries",
+          "content": "1. Check slow query log: GET /_search slowlog\n2. Optimize query with filters instead of queries where possible\n3. Add pagination to large result sets\n4. Consider caching frequent queries in Redis"
+        },
+        {
+          "title": "Escalation",
+          "content": "Contact Data Team on-call: #data-team Slack channel\nPagerDuty: data-standard service"
+        }
+      ]
+    },
+    {
+      "id": "RUNBOOK-ORDER",
+      "service": "order-service",
+      "title": "Order Service Runbook",
+      "sections": [
+        {
+          "title": "Database Deadlocks",
+          "content": "1. Check for deadlocks: SELECT * FROM pg_stat_activity WHERE wait_event_type = 'Lock'\n2. Kill blocking queries: SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE ...\n3. Review transaction isolation levels\n4. Ensure proper row-level locking with SELECT FOR UPDATE"
+        },
+        {
+          "title": "Order Processing Delays",
+          "content": "1. Check order queue depth: Redis LLEN order_queue\n2. Verify payment-service and inventory-service health\n3. Check for stuck orders: SELECT * FROM orders WHERE status = 'processing' AND created_at < NOW() - INTERVAL '1 hour'\n4. Manually retry stuck orders if needed"
+        },
+        {
+          "title": "Escalation",
+          "content": "Contact Commerce Team on-call: #commerce-team Slack channel\nPagerDuty: commerce-critical service"
+        }
+      ]
+    }
+  ],
+  "infrastructure": {
+    "kubernetes_cluster": "acme-prod-us-east-1",
+    "cloud_provider": "AWS",
+    "region": "us-east-1",
+    "databases": {
+      "postgresql": {
+        "primary": "postgres-primary.acme-internal",
+        "read_replicas": ["postgres-replica-1.acme-internal", "postgres-replica-2.acme-internal"],
+        "version": "15.4",
+        "instance_type": "db.r6g.xlarge"
+      },
+      "redis": {
+        "cluster": "redis-cluster.acme-internal",
+        "version": "7.0",
+        "node_type": "cache.r6g.large",
+        "num_replicas": 2
+      },
+      "elasticsearch": {
+        "cluster": "es-cluster.acme-internal",
+        "version": "8.11",
+        "nodes": 3,
+        "instance_type": "r6g.large.search"
+      },
+      "rabbitmq": {
+        "cluster": "rabbitmq-cluster.acme-internal",
+        "version": "3.12",
+        "nodes": 3
+      }
+    },
+    "monitoring": {
+      "prometheus": "prometheus.acme-internal",
+      "grafana": "grafana.acme-internal",
+      "alertmanager": "alertmanager.acme-internal",
+      "pagerduty_integration": true
+    },
+    "ci_cd": {
+      "github_actions": true,
+      "argocd": true,
+      "deployment_strategy": "rolling"
+    }
+  }
+}
